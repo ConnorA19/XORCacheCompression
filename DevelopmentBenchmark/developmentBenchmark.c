@@ -4,6 +4,7 @@
 
 //Find the 0 in an array of a n elements
 int findOneInNElements(const int n){
+  printf("Running Test 4\n");
   int* array = calloc(n, sizeof(int));
   int index = rand() % n;
   array[index] = 1;
@@ -22,6 +23,7 @@ int findOneInNElements(const int n){
 }
 
 void countFivesInNElements(const int n){
+  printf("Running Test 1\n");
   int* array = calloc(n, sizeof(int));
 
   //Go through all values and add increasing values
@@ -40,6 +42,7 @@ void countFivesInNElements(const int n){
 }
 
 void countFivesInSparseNElements(const int n){
+  printf("Running Test 3\n");
   int* array = calloc(n, sizeof(int));
 
   //Go through all values and add a value every 10 elements
@@ -61,6 +64,7 @@ void countFivesInSparseNElements(const int n){
 
 
 void countFivesInRandomNElements(const int n){
+    printf("Running Test 2\n");
   int* array = calloc(n, sizeof(int));
 
   //Go through all values and add random values
@@ -79,11 +83,31 @@ void countFivesInRandomNElements(const int n){
 }
 
 
-int main(){
+int main(int argc, char** argv){
   srand(time(NULL));
   const int n = 100000000;
-  countFivesInNElements(n);
-  countFivesInRandomNElements(n);
-  countFivesInSparseNElements(n);
-  findOneInNElements(n);
+  if (argc == 1){
+    countFivesInNElements(n);
+    countFivesInRandomNElements(n);
+    countFivesInSparseNElements(n);
+    findOneInNElements(n);
+  }
+  //1
+  //countFivesInNElements(n);
+  //2
+  //countFivesInRandomNElements(n);
+  //3
+  //countFivesInSparseNElements(n);
+  //4
+  //findOneInNElements(n);
+
+  else{
+    for (int i = 1; i < argc; i++){
+      int testIdx = atoi(argv[i]);
+      if (testIdx == 1) countFivesInNElements(n);
+      if (testIdx == 2) countFivesInRandomNElements(n);
+      if (testIdx == 3) countFivesInSparseNElements(n);
+      if (testIdx == 4) findOneInNElements(n);
+    }
+  }
 }
