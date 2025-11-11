@@ -9,11 +9,21 @@ Lila Craveiro (crave112@umn.edu)
 Zannatun Sristy (srist001@umn.edu)
 
 # Setup
-To activate python or gem5 run: 
-  ```sh
-  source startUp.sh
-  ```
-This will set up a virtual environment for running the code.
+## Python Environment
+If you have a python environment already run 
+```
+source PATH/TO/PYVENV/bin/activate
+```
+If you do not have a python environment you can run
+```
+python -m venv PATH/TO/FOLDER/YOU/WANT/YOUR/VENV/IN
+```
+Once you have sourced the activate run
+```
+pip install -r requirements.txt
+```
+
+## Gem5
 
 Then run: 
 
