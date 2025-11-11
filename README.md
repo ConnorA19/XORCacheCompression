@@ -7,3 +7,6 @@ Connor Antony (anton386@umn.edu)
 Lila Craveiro (crave112@umn.edu)
 
 Zannatun Sristy (srist001@umn.edu)
+
+# Setup
+To activate python or gem5 use source startUp.sh
