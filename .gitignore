@@ -1,3 +1,5 @@
-gem5/
-!/gem5/configs
-!/gem5/tests
+gem5/*
+!gem5/configs
+!gem5/tests
+!gem5/configs/**
+!gem5/test/**
