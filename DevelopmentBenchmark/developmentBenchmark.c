@@ -85,7 +85,7 @@ void countFivesInRandomNElements(const int n){
 
 int main(int argc, char** argv){
   srand(time(NULL));
-  const int n = 100000000;
+  const int n = 1000;
   if (argc == 1){
     countFivesInNElements(n);
     countFivesInRandomNElements(n);
