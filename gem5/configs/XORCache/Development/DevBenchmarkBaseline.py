@@ -45,15 +45,22 @@ from BaselineCaches import *
 # import the SimpleOpts module
 from common import SimpleOpts
 
+import argparse
+parser = argparse.ArgumentParser(description='Input n')
+parser.add_argument("-n", nargs="?", default="1000")
 # Running Benchmark
 thispath = os.path.dirname(os.path.realpath(__file__))
 default_binary = os.path.join(thispath, '../../../', 'tests/test-progs/DevelopmentBenchmark/x86Linux/developmentBenchmark')
 
 # Binary to execute
 SimpleOpts.add_option('binary', nargs='?', default=default_binary)
+SimpleOpts.add_option('-n', nargs='?', default=parser.parse_args())
 
 # Finalize the arguments and grab the args so we can pass it on to our objects
 args = SimpleOpts.parse_args()
+print("--------------")
+print(args)
+print("--------------")
 
 # create the system we are going to simulate
 system = System()
@@ -116,7 +123,7 @@ system.workload = SEWorkload.init_compatible(args.binary)
 process = Process()
 # Set the command
 # cmd is a list which begins with the executable (like argv)
-process.cmd = [args.binary]
+process.cmd = [args.binary, args.n]
 # Set the cpu to use the process as its workload and create thread contexts
 system.cpu.workload = process
 system.cpu.createThreads()

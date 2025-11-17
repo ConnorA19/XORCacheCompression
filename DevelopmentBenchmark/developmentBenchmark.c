@@ -85,6 +85,9 @@ void countFivesInRandomNElements(const int n){
 
 int main(int argc, char** argv){
   srand(time(NULL));
+  // for (int i = 0; i < argc; i++){
+  //   printf("%s", argv[i]);
+  // }
   if (argc == 2){
     int n = atoi(argv[1]);
     countFivesInNElements(n);
