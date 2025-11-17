@@ -85,8 +85,8 @@ void countFivesInRandomNElements(const int n){
 
 int main(int argc, char** argv){
   srand(time(NULL));
-  const int n = 1000;
-  if (argc == 1){
+  if (argc == 2){
+    int n = atoi(argv[1]);
     countFivesInNElements(n);
     countFivesInRandomNElements(n);
     countFivesInSparseNElements(n);
@@ -102,7 +102,8 @@ int main(int argc, char** argv){
   //findOneInNElements(n);
 
   else{
-    for (int i = 1; i < argc; i++){
+    int n = atoi(argv[1]);
+    for (int i = 2; i < argc; i++){
       int testIdx = atoi(argv[i]);
       if (testIdx == 1) countFivesInNElements(n);
       if (testIdx == 2) countFivesInRandomNElements(n);
