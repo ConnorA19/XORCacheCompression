@@ -24,12 +24,22 @@ pip install -r requirements.txt
 ```
 
 ## Gem5
-
+Move the current Gem5 configs and tests with
+```
+mv ./gem5 ./gem5Temp
+```
 Then run: 
 
   ```sh
   git clone https://github.com/gem5/gem5
+  rm -rf ./gem5/.git
   ```
+Then move configs and tests back with
+```
+rm -rf ./gem5/configs
+rm -rf ./gem5/tests
+mv ./gem5Temp/* ./gem5/
+```
 
 # Benchmarks
 There are 4 benchmarks for testing the program. Each has a differently composed array, and a given task to complete:
