@@ -32,6 +32,7 @@ Then run:
 
   ```sh
   git clone https://github.com/gem5/gem5
+  rm -rf ./gem5/.git
   ```
 Then move configs and tests back with
 ```
