@@ -11,7 +11,7 @@
 \usetheme{Copenhagen}
 \usecolortheme{default}
 
-\title[Cache Compression] %optional
+\title[XOR Cache Compression] %optional
 {Cache Compression}
 \subtitle{Utilizing Compression Algorithms to Increase Cache Efficiency}
 \author[Aliji, Antony, Craveiro, Sristy] % (optional)
@@ -89,6 +89,31 @@ One factor we chose to focus on:
 
 \medskip
 
+\end{frame}
+
+\begin{frame}{Motivation - Scholarship}
+
+Previous methods of cache compression: 
+
+\medskip
+
+\begin{itemize}
+    \item Base-Delta Immediate (2012): Leverage small differences between values stored in a cache line. Represent cache lines in more compact form; use base values and an array of differences between values. (intra-line)
+    \item Base and Compressed Difference Deduplication (2021): Makes use of partial matches across blocks; high bits tend to have common values acorss blocks even if they are different within blocks. Series of compression and deduplication of partially matching blocks. (inter-line)
+\end{itemize}
+
+\medskip
+
+
+
+\end{frame}
+
+\begin{frame}{Motivation - XOR Cache}
+    \textbf{Goal}: A feasible and simple method of cache compression that is still able to significantly improve cache performance
+
+\medskip
+
+Making use of both intra and inter-line redundancy, we chose to implement the \textbf{XOR Cache} (2025)
 \end{frame}
 
 \begin{frame}[allowframebreaks]{References} 
