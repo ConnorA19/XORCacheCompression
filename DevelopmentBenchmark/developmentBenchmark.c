@@ -69,7 +69,7 @@ void countFivesInRandomNElements(const int n){
 
   //Go through all values and add random values
   for (int i = 0; i < n; i++){
-    array[i] = (rand() + 1) % 10;
+    array[i] = (rand() + 1) % 100;
   }
   
   int* count = calloc(10, sizeof(int));
