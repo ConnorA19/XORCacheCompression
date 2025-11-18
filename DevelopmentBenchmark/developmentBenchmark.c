@@ -31,13 +31,14 @@ void countFivesInNElements(const int n){
     array[i] = i % 10;
   }
   
-  int* count = calloc(10, sizeof(int));
+  int fiveCount = 0;
   for (int i = 0; i < n; i++){
-    count[array[i]]++;
+    if (array[i] == 5){
+      fiveCount++;
+    }
   }
-  printf("In list of %d, count of 5's: %d\n", n, count[5]);
+  printf("In list of %d, count of 5's: %d\n", n, fiveCount);
   
-  free(count);
   free(array);
 }
 
@@ -51,14 +52,14 @@ void countFivesInSparseNElements(const int n){
       array[i] = i % 10;
     }
   }
-  
-  int* count = calloc(10, sizeof(int));
+  int fiveCount = 0;
   for (int i = 0; i < n; i++){
-    count[array[i]]++;
+    if (array[i] == 5){
+      fiveCount++;
+    }
   }
-  printf("In list of %d, count of sparse 5's: %d\n", n, count[5]);
+  printf("In list of %d, count of sparse 5's: %d\n", n, fiveCount);
   
-  free(count);
   free(array);
 }
 
@@ -69,16 +70,18 @@ void countFivesInRandomNElements(const int n){
 
   //Go through all values and add random values
   for (int i = 0; i < n; i++){
-    array[i] = (rand() + 1) % 10;
+    array[i] = (rand() + 1) % 100;
   }
   
-  int* count = calloc(10, sizeof(int));
+  int fiveCount = 0;
   for (int i = 0; i < n; i++){
-    count[array[i]]++;
+    if (array[i] == 5){
+      fiveCount++;
+    }
   }
-  printf("In list of %d, count of Random 5's: %d\n", n, count[5]);
+
+  printf("In list of %d, count of Random 5's: %d\n", n, fiveCount);
   
-  free(count);
   free(array);
 }
 
