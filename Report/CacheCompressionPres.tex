@@ -1,0 +1,73 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Welcome to Overleaf --- just edit your LaTeX on the left,
+% and we'll compile it for you on the right. If you open the
+% 'Share' menu, you can invite other users to edit at the same
+% time. See www.overleaf.com/learn for more info. Enjoy!
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{beamer}
+\usepackage{tikz}
+\usetheme{Copenhagen}
+\usecolortheme{default}
+
+\title[Cache Compression] %optional
+{Cache Compression}
+\subtitle{Utilizing Compression Algorithms to Increase Cache Efficiency}
+\author[Aliji, Antony, Craveiro, Sristy] % (optional)
+{I.~Aliji \and C.~Antony \and L.~Craveiro \and Z.N.~Sristy}
+
+\institute[VFU] 
+{
+  %
+  College of Science and Engineering\\
+  University of Minnesota - Twin Cities
+
+}
+
+\date[VLC 2021] % (optional)
+{CSCI 5204, Fall 2025}
+
+% Use a simple TikZ graphic to show where the logo is positioned
+% \logo{\begin{tikzpicture}
+% \filldraw[color=red!50, fill=red!25, very thick](0,0) circle (0.5);
+% \node[draw,color=white] at (0,0) {LOGO HERE};
+% \end{tikzpicture}}
+
+%End of title page configuration block
+%------------------------------------------------------------
+%The next block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%------------------------------------------------------------
+\begin{document}
+\frame{\titlepage}
+%---------------------------------------------------------
+%Highlighting text
+\begin{frame}
+\frametitle{Introduction}
+
+Compression techniques are utilized in many facets of computing, increasing the efficiency of data transfers. Utilizing some of these methods on a processor's cache is a great use case. The goal of our research is to implement different compression algorithms on the cache. 
+
+
+
+
+
+\end{frame}
+\begin{frame}{Methodology}
+    
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References} 
+    \nocite{*}
+    \bibliographystyle{unsrt}
+    \bibliography{reference}
+\end{frame}
+\end{document}
