@@ -61,8 +61,34 @@ Compression techniques are utilized in many facets of computing, increasing the 
 
 
 \end{frame}
-\begin{frame}{Methodology}
+\begin{frame}{Motivation - Cache Compression}
+Cache Compression Goal: condense larger chunks of data into smaller blocks without losing any information
+
+\medskip
+
+Why cache compression?
+\begin{itemize}
+    \item Benefits of increasing cache size without latency concerns or other losses that can occur from larger cache sizes
+\end{itemize}
     
+\end{frame}
+
+\begin{frame}{Motivation - Granularity}
+Compression methods vary by compaction scheme
+
+\medskip
+
+One factor we chose to focus on:
+\textbf{Granularity}
+\begin{itemize}
+    \item Granularity: whether deduplication occurs between values in a line or between the lines themselves.
+    \item Intra-line reduces size of data being stored by exploiting internal line patterns
+    \item Inter-line leverages similarity across multiple cache lines
+    \item Some methods make use of a hybrid approach that uese both intra and inter line-compression
+\end{itemize}
+
+\medskip
+
 \end{frame}
 
 \begin{frame}[allowframebreaks]{References} 
