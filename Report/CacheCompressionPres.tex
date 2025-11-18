@@ -7,6 +7,8 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass{beamer}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{tikz}
 \usetheme{Copenhagen}
 \usecolortheme{default}
@@ -59,7 +61,6 @@ Compression techniques are utilized in many facets of computing, increasing the 
 
 
 
-
 \end{frame}
 \begin{frame}{Motivation - Cache Compression}
 Cache Compression Goal: condense larger chunks of data into smaller blocks without losing any information
@@ -71,6 +72,18 @@ Why cache compression?
     \item Benefits of increasing cache size without latency concerns or other losses that can occur from larger cache sizes
 \end{itemize}
     
+\end{frame}
+
+\begin{frame}{Development Benchmarks}
+
+\begin{algorithm}
+    \caption{My Algorithm}
+    \label{alg:myalgorithm}
+    \begin{algorithmic}[1] % [1] adds line numbering
+        % Algorithm steps go here
+    \end{algorithmic}
+\end{algorithm}
+
 \end{frame}
 
 \begin{frame}{Motivation - Granularity}

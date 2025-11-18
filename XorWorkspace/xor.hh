@@ -48,7 +48,7 @@ class Xor::XorCompressionData : public Base::CompressionData
     public:
         std::vector<Chunk> xorChunks;
 
-        XorCompressionData(unsign num_chunks)
+        XorCompressionData(unsigned num_chunks)
         {
             xorChunks.resize(num_chunks);
         }

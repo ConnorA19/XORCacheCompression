@@ -18,14 +18,14 @@ namespace gem5
 namespace compression
 {
 
-xor::xor(const Params &p) : Base(p){}
+Xor::Xor(const Params &p) : Base(p){}
 
 std::unique_ptr<Base::CompressionData>
-xor::compress(const std::vector<Chunk>& chunks,
+Xor::compress(const std::vector<Chunk>& chunks,
             Cycles& comp_lat,
             Cycles& decomp_lat)
 {
-    const unsigne N = chunks.size();
+    const unsigned N = chunks.size();
     auto data = std::make_unique<XorCompressionData>(N);
 
     if (N == 0) {
@@ -36,7 +36,7 @@ xor::compress(const std::vector<Chunk>& chunks,
     data->xorChunks[0] = chunks[0];
 
     for (unsigned i = 1; i < N; i++){
-        data->xorChunks[i] = chunks[i] ^ chunks[i - 1];
+        data->xorChunks[i] = chunks[i] ^ chunks[i - 1];  // XOR One chunk from another
     }
 
     data->setSizeBits(N * chunkSizeBits);
@@ -76,5 +76,10 @@ void Xor::decompress(const CompressionData* comp_data,
 
 }
 
+Xor*
+XorCacheCompressorParams::create()
+{
+    return new compression::Xor(this);
+}
 
 }
