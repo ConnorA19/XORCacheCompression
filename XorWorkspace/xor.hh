@@ -56,13 +56,6 @@ class Xor::XorCompressionData : public Base::CompressionData
         virtual ~XorCompressionData(){}
 };
 }
-
-Xor*
-XorCacheCompressorParams::create()
-{
-    return new compression::Xor(this);
-}
-
 }
 
 #endif

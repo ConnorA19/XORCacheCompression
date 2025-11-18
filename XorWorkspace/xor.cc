@@ -76,5 +76,10 @@ void Xor::decompress(const CompressionData* comp_data,
 
 }
 
+Xor*
+XorCacheCompressorParams::create()
+{
+    return new compression::Xor(this);
+}
 
 }
