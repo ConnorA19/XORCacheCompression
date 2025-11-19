@@ -78,3 +78,7 @@ class L1DCache(L1Cache):
     def connectCPU(self, cpu):
         """Connect this cache's port to a CPU dcache port"""
         self.cpu_side = cpu.dcache_port
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/main

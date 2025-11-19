@@ -37,7 +37,6 @@ void countFivesInNElements(const int n){
       fiveCount++;
     }
   }
-  printf("In list of %d, count of 5's: %d\n", n, fiveCount);
   
   free(array);
 }
@@ -51,6 +50,7 @@ void countFivesInSparseNElements(const int n){
     if ((i % 10) == 5){
       array[i] = i % 10;
     }
+    printf("%d", array[i]);
   }
   int fiveCount = 0;
   for (int i = 0; i < n; i++){

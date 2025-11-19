@@ -87,7 +87,6 @@ system.membus = SystemXBar()
 system.cpu.icache.connectMem(system.membus)
 system.cpu.dcache.connectMem(system.membus)
 
-
 # create the interrupt controller for the CPU
 system.cpu.createInterruptController()
 system.cpu.interrupts[0].pio = system.membus.mem_side_ports

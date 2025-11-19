@@ -4,6 +4,7 @@
 
 //Find the 0 in an array of a n elements
 int findOneInNElements(const int n){
+    printf("Running Test 4\n");
     int* array = calloc(n, sizeof(int));
     int index = rand() % n;
     array[index] = 1;
@@ -21,8 +22,8 @@ int findOneInNElements(const int n){
     return retIndex;
 }
 
-int main(){
+int main(int argc, char** argv){
     srand(time(NULL));
-    const int n = 100000000;
+    int n = atoi(argv[1]);
     findOneInNElements(n);
 }
