@@ -3,7 +3,7 @@ This file runs the development benchmark with the default cache implementation
 """
 
 import m5
-from m5.objects import Cache
+from m5.objects import Cache, Compressors
 
 # Add the common scripts to our path
 m5.util.addToPath('../../')
@@ -36,6 +36,9 @@ class L1Cache(Cache):
         """Connect this cache's port to a CPU-side port
         This must be defined in a subclass"""
         raise NotImplementedError
+    
+    def connectMem(self, bus):
+        self.mem_side = bus.cpu_side_ports
 
 
 class L1ICache(L1Cache):
@@ -61,12 +64,13 @@ class L1DCache(L1Cache):
     """Simple L1 data cache with default values"""
 
     # Set the default size
-    size = '64KiB'
+    size = '2KiB'
 
     SimpleOpts.add_option('--l1d_size', help=f'L1 data cache size. Default: {size}')
 
     def __init__(self, opts=None):
         super().__init__(opts)
+        self.compression = Compressors.FPCD()
         if not opts or not opts.l1d_size:
             return
         self.size = opts.l1d_size
@@ -74,30 +78,3 @@ class L1DCache(L1Cache):
     def connectCPU(self, cpu):
         """Connect this cache's port to a CPU dcache port"""
         self.cpu_side = cpu.dcache_port
-
-
-class L2Cache(Cache):
-    """Simple L2 Cache with default values"""
-
-    # Default parameters
-    size = '256KiB'
-    assoc = 8
-    tag_latency = 20
-    data_latency = 20
-    response_latency = 20
-    mshrs = 20
-    tgts_per_mshr = 12
-
-    SimpleOpts.add_option('--l2_size', help=f'L2 cache size. Default: {size}')
-
-    def __init__(self, opts=None):
-        super().__init__()
-        if not opts or not opts.l2_size:
-            return
-        self.size = opts.l2_size
-
-    def connectCPUSideBus(self, bus):
-        self.cpu_side = bus.mem_side_ports
-
-    def connectMemSideBus(self, bus):
-        self.mem_side = bus.cpu_side_ports

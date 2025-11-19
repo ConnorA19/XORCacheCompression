@@ -51,7 +51,7 @@ default_binary = os.path.join(thispath, '../../../', 'tests/test-progs/Developme
 
 # Binary to execute
 SimpleOpts.add_option('binary', nargs=1)
-SimpleOpts.add_option('-n', nargs=1, default="100000")
+SimpleOpts.add_option('-n', nargs=1)
 
 # Finalize the arguments and grab the args so we can pass it on to our objects
 args = SimpleOpts.parse_args()
@@ -80,22 +80,13 @@ system.cpu.dcache = L1DCache(args)
 system.cpu.icache.connectCPU(system.cpu)
 system.cpu.dcache.connectCPU(system.cpu)
 
-# Create a memory bus, a coherent crossbar, in this case
-system.l2bus = L2XBar()
-
-# Hook the CPU ports up to the l2bus
-system.cpu.icache.connectBus(system.l2bus)
-system.cpu.dcache.connectBus(system.l2bus)
-
-# Create an L2 cache and connect it to the l2bus
-system.l2cache = L2Cache(args)
-system.l2cache.connectCPUSideBus(system.l2bus)
-
 # Create a memory bus
 system.membus = SystemXBar()
 
 # Connect the L2 cache to the membus
-system.l2cache.connectMemSideBus(system.membus)
+system.cpu.icache.connectMem(system.membus)
+system.cpu.dcache.connectMem(system.membus)
+
 
 # create the interrupt controller for the CPU
 system.cpu.createInterruptController()
@@ -118,7 +109,7 @@ system.workload = SEWorkload.init_compatible(args.binary)
 process = Process()
 # Set the command
 # cmd is a list which begins with the executable (like argv)
-process.cmd = [args.binary, args.n]
+process.cmd = [args.binary, args.n[0]]
 # Set the cpu to use the process as its workload and create thread contexts
 system.cpu.workload = process
 system.cpu.createThreads()
