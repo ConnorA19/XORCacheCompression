@@ -8,17 +8,16 @@ of the original 2 lines (very simple!)
 
 #include "mem/cache/compressors/xor.hh"
 
-
 #include "base/bitfield.hh"
 #include "debug/CacheComp.hh"
-#include "params/xor.hh"
+#include "params/Xor.hh"
 
 namespace gem5
 {
 namespace compression
 {
 
-Xor::Xor(const Params &p) : Base(p){}
+Xor::Xor(const XorParams &p) : Base(p){}
 
 std::unique_ptr<Base::CompressionData>
 Xor::compress(const std::vector<Chunk>& chunks,
@@ -74,12 +73,6 @@ void Xor::decompress(const CompressionData* comp_data,
     "XORCompressor: decompressed %u chunks\n", N);
 }
 
-}
 
-Xor*
-XorCacheCompressorParams::create()
-{
-    return new compression::Xor(this);
-}
-
-}
+} // namespace compression
+} // namespace gem5

@@ -1,37 +1,31 @@
-/**
- * @file xor.hh
- * @author Imran Aliji, Connor Antony, Lila Craveiro, Zannatun Sristy
- * @brief 
- * @version 0.1
- * @date 2025-11-18
- * 
- * @copyright Copyright (c) 2025
- * 
- */
+
 
 #ifndef __MEM_CACHE_COMPRESSORS_XOR_HH__
 #define __MEM_CACHE_COMPRESSORS_XOR_HH__
 
 #include "mem/cache/compressors/base.hh"
+#include "params/Xor.hh"
 
 namespace gem5
 {
 
-struct XorCacheCompressorParams;
 
 namespace compression
 {
+
 
 class Xor : public Base
 {
 
     public:
-        class XorCompressionData;
-
-        using Params = XorCacheCompressorParams;
-        Xor(const Params &p);
+        typedef XorParams Params;
+        Xor(const XorParams &p);
+        ~Xor() = default;
 
     protected:
+
+        class XorCompressionData;
+    
         std::unique_ptr<CompressionData> compress(
             const std::vector<Chunk>& chunks,
             Cycles& comp_lat,
@@ -39,11 +33,11 @@ class Xor : public Base
         ) override;
 
         void decompress(const CompressionData* comp_data,
-        uint64_t* cache_line) override;
+            uint64_t* cache_line) override;
 
 };
 
-class Xor::XorCompressionData : public Base::CompressionData
+class Xor::XorCompressionData : public CompressionData
 {
     public:
         std::vector<Chunk> xorChunks;
@@ -55,7 +49,8 @@ class Xor::XorCompressionData : public Base::CompressionData
 
         virtual ~XorCompressionData(){}
 };
-}
-}
+
+} // namespace compression
+} // namespace gem5
 
 #endif
