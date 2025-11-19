@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 void countFivesInNElements(const int n){
+    printf("Running Test 1\n");
     int* array = calloc(n, sizeof(int));
 
     //Go through all values and add increasing values
@@ -9,20 +10,19 @@ void countFivesInNElements(const int n){
         array[i] = i % 10;
     }
 
-    int* count = calloc(10, sizeof(int));
+    int fiveCount = 0;
     for (int i = 0; i < n; i++){
-        count[array[i]]++;
+        if (array[i] == 5){
+            fiveCount++;
+        }
     }
-    printf("In list of %d, count of 5's: %d\n", n, count[5]);
+    printf("In list of %d, count of 5's: %d\n", n, fiveCount);
 
-    free(count);
     free(array);
 }
 
-
-
-int main(){
+int main(int argc, char** argv){
     srand(time(NULL));
-    const int n = 100000000;
+    int n = atoi(argv[1]);
     countFivesInNElements(n);
 }
