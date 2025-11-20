@@ -16,7 +16,7 @@
 \usepackage{algpseudocode}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 
-\title[Cache Compression] %optional
+\title[XOR Cache Compression] %optional
 {Cache Compression}
 \subtitle{Utilizing Compression Algorithms to Increase Cache Efficiency}
 \author[Aliji, Antony, Craveiro, Sristy] % (optional)
@@ -58,7 +58,7 @@
 %Highlighting text
 \begin{frame}{Introduction}
 
-Compression techniques are utilized in many facets of computing, increasing the efficiency of data transfers. Utilizing some of these methods on a processor's cache is a great use case. The goal of our research is to implement different compression algorithms on the cache. 
+Compression techniques are utilized in many facets of computing, increasing the efficiency of data transfers. Utilizing some of these methods on a processor's cache is a great use case. The goal of our research is to implement the XOR  compression algorithm on the cache and compare it with others. 
 
 \end{frame}
 
@@ -324,7 +324,7 @@ Making use of both intra and inter-line redundancy, we chose to implement the \t
 
 
 \begin{frame}{Tests \& Benchmarks}
-For testing we are going to use all the Gem5 benchmarks (i.e., blackscholes, bodytrack, ..., x264) in addition with 4 of our own smaller benchmarks for focusing on the functioning of the cache compression algorithm rather than cache performance in general.
+For testing we are going to use all the Gem5 benchmarks (i.e., blackscholes, bodytrack, ..., x264) in addition with 4 of our own smaller benchmarks for focusing on the functioning and creation of the cache compression algorithm rather than cache performance in general.
 
 
 
@@ -353,9 +353,16 @@ This benchmark will fill an array with all zeroes except one random single value
 
 \medskip
 
-Ex:
-\medskip
-0 0 0 0 ... 1 0 0 ...
+\footnotesize
+ \begin{tabular}{|c|c|c|}
+        \hline
+        Line & Raw Data & $\oplus$\\
+        \hline
+        1 & 0,0,0,0 & 0,0,0,0 \\
+        2 & 0,0,0,0 & 0,0,0,0 \\
+        3 & 0,0,0,0 & 0,0,0,0\\
+        \hline
+        \end{tabular}
 \end{column}
 
 \begin{column}{0.52\textwidth}
@@ -407,9 +414,16 @@ This benchmark fills the array with sequentially increasing values. It is then t
 
 \medskip
 
-Ex: 
-\medskip 
-1 2 3 4 5 ... 
+\footnotesize
+ \begin{tabular}{|c|c|c|}
+        \hline
+        Line & Raw Data & $\oplus$\\
+        \hline
+        1 & 1,2,3,4 & 0,0,0,0 \\
+        2 & 1,2,3,4 & 0,0,0,0 \\
+        3 & 1,2,3,4 & 0,0,0,0\\
+        \hline
+        \end{tabular}
 \end{column}
 
 \begin{column}{0.52\textwidth}
@@ -462,11 +476,18 @@ Ex:
 \begin{column}{0.44\textwidth}
 Fills array with random values and tasked with counting the number of 5s
 
-\medskip
 
-Ex: 
-\medskip 
-70 34 6 78 5 89 ...
+ \footnotesize
+ \begin{tabular}{|c|c|c|}
+        \hline
+        Line & Raw Data & $\oplus$\\
+        \hline
+        1 & 0,0,0,0 & 0,0,0,0 \\
+        2 & 11,78,93,45 & 11,78,93,45 \\
+        3 & 32,18,46,20 & 43,92,115,57\\
+        \hline
+        \end{tabular}
+
 \end{column}
 
 \begin{column}{0.52\textwidth}
@@ -521,9 +542,16 @@ This benchmark fills the array with an item every next 5th item in the array. Ta
 
 \medskip
 
-Ex: 
-\medskip 
-0 0 0 0 5 0 ... 
+\footnotesize
+ \begin{tabular}{|c|c|c|}
+        \hline
+        Line & Raw Data & $\oplus$\\
+        \hline
+        1 & 0,0,5,0 & 0,0,0,0 \\
+        2 & 0,0,5,0 & 0,0,0,0 \\
+        3 & 0,0,5,0 & 0,0,0,0\\
+        \hline
+        \end{tabular}
 \end{column}
 
 \begin{column}{0.52\textwidth}
@@ -570,6 +598,20 @@ Ex:
 \end{frame}
 
 \begin{frame}{What We have Done}
+    \begin{itemize}
+        \item Implemented the XOR algorithm in gem5
+        \item Created a gem5 simulation to simulate an x86 cpu with l1d cache utilizing compression
+        \item Created scripts to run development benchmarks
+    \end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Development Benchmark setup}
+    \begin{itemize}
+        \item L1d Cache 
+        \item Created a gem5 simulation to simulate an x86 cpu with l1d cache utilizing compression
+        \item Created scripts to run development benchmarks
+    \end{itemize}
     
 \end{frame}
 
@@ -592,7 +634,8 @@ Ex:
 
 \begin{frame}{Challenges}
 \begin{itemize}
-    \item One of the major challenge was \textbf{gem5 version compatibility}. The older stable version has a known bug where compressed tags are broken which requires to switch to a newer develop branch (v24.1)) but then again, DevBenchmarkBaseline started throwing a ``bad\_function\_call'' error—yet switching back to v23.1 made it run again.
+    \item One of the major challenges was \textbf{gem5 version compatibility}. Using the current stable branch (v24.1) started throws a ``bad\_function\_call'' error that was found and fixed 1 week ago.  However, switching to the develop branch (v25.1.x) caused assertion errors with the tags needed to start compression.  Switching to version (v23.1) ran the compressors as expected.
+    \item The other primary challenge was \textbf{scons compile time}. As you know from programming assignment 1 and 2 scons, takes awhile to run and awhile to fail when compiling.
 \end{itemize}
     
 \end{frame}

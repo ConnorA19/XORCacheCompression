@@ -1,2 +1,2 @@
 slides: ./CacheCompressionPres.tex
-	pdflatex -output-directory=build ./CacheCompressionPres.tex
+	pdflatex -interaction=batchmode -interaction=nonstopmode -output-directory=build ./CacheCompressionPres.tex
