@@ -7,14 +7,17 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass{beamer}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
 \usepackage{tikz}
 \usetheme{Copenhagen}
 \usecolortheme{default}
+\usepackage{graphicx}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage{algpseudocode}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 
-\title[XOR Cache Compression] %optional
-{XOR Cache Compression}
+\title[Cache Compression] %optional
+{Cache Compression}
 \subtitle{Utilizing Compression Algorithms to Increase Cache Efficiency}
 \author[Aliji, Antony, Craveiro, Sristy] % (optional)
 {I.~Aliji \and C.~Antony \and L.~Craveiro \and Z.N.~Sristy}
@@ -53,15 +56,14 @@
 \frame{\titlepage}
 %---------------------------------------------------------
 %Highlighting text
-\begin{frame}
-\frametitle{Introduction}
+\begin{frame}{Introduction}
 
 Compression techniques are utilized in many facets of computing, increasing the efficiency of data transfers. Utilizing some of these methods on a processor's cache is a great use case. The goal of our research is to implement different compression algorithms on the cache. 
 
-
-
-
 \end{frame}
+
+
+
 \begin{frame}{Motivation - Cache Compression}
 Cache Compression Goal: condense larger chunks of data into smaller blocks without losing any information
 
@@ -74,64 +76,542 @@ Why cache compression?
     
 \end{frame}
 
-\begin{frame}{Development Benchmarks}
 
-\begin{algorithm}
-    \caption{My Algorithm}
-    \label{alg:myalgorithm}
-    \begin{algorithmic}[1] % [1] adds line numbering
-        % Algorithm steps go here
-    \end{algorithmic}
-\end{algorithm}
-
-\end{frame}
-
-\begin{frame}{Motivation - Granularity}
-Compression methods vary by compaction scheme
-
-\medskip
-
-One factor we chose to focus on:
-\textbf{Granularity}
-\begin{itemize}
-    \item Granularity: whether deduplication occurs between values in a line or between the lines themselves.
-    \item Intra-line reduces size of data being stored by exploiting internal line patterns
-    \item Inter-line leverages similarity across multiple cache lines
-    \item Some methods make use of a hybrid approach that uese both intra and inter line-compression
-\end{itemize}
-
-\medskip
-
-\end{frame}
 
 \begin{frame}{Motivation - Scholarship}
 
-Previous methods of cache compression: 
+Vary by \textbf{Granularity}: 
 
 \medskip
 
 \begin{itemize}
-    \item Base-Delta Immediate (2012): Leverage small differences between values stored in a cache line. Represent cache lines in more compact form; use base values and an array of differences between values. (intra-line)
-    \item Base and Compressed Difference Deduplication (2021): Makes use of partial matches across blocks; high bits tend to have common values acorss blocks even if they are different within blocks. Series of compression and deduplication of partially matching blocks. (inter-line)
+    \item Base-Delta Immediate \footnote{\fontsize{6pt}{4pt}\selectfont Gennady Pekhimenko, Vivek Seshadri, Onur Mutlu, Phillip B. Gibbons, Michael A. Kozuch, and Todd C. Mowry. Base-delta-immediate compression: practical data compression for on-chip caches. PACT 2012.}: Leverage small differences between values stored in a cache line. Represent cache lines in more compact form; use base values and an array of differences between values. (intra-line)
+    \item Base and Compressed Difference Deduplication \footnote{\fontsize{6pt}{4pt}\selectfont Sungbo Park, Ingab Kang, Yaebin Moon, Jung Ho Ahn, and G. Edward Suh. Bcd deduplication: effective memory compression using partial cache-line deduplication. ASPLOS 2021.}: Makes use of partial matches across blocks; high bits tend to have common values acorss blocks even if they are different within blocks. Series of compression and deduplication of partially matching blocks. (inter-line)
 \end{itemize}
 
 \medskip
 
 
 
+
 \end{frame}
+
+
 
 \begin{frame}{Motivation - XOR Cache}
     \textbf{Goal}: A feasible and simple method of cache compression that is still able to significantly improve cache performance
 
 \medskip
 
-Making use of both intra and inter-line redundancy, we chose to implement the \textbf{XOR Cache} (2025)
+Making use of both intra and inter-line redundancy, we chose to implement the \textbf{XOR Cache} \footnote{\fontsize{6pt}{4pt}\selectfont Zhewen Pan and Joshua San Miguel. The xor cache: A catalyst for compression.  ISCA 2025.}
 \end{frame}
+
+
+
+\begin{frame}{XOR Cache: High level overview}
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=.6\textwidth]{High level overview.jpg}
+        \label{fig:myfigure}
+    \end{figure}
+    
+    \begin{itemize}
+        \item Unlike a conventional cache that stores full lines as-is, XOR Cache compresses pairs of lines.
+        \item If line \textbf{A} already exists in the L1 caches (due to inclusion), the LLC can store \textbf{A $\oplus$ B} instead of storing both A and B.
+    \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{XOR Cache: How does it work?}
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=.6\textwidth]{High level overview.jpg}
+        \label{fig:myfigure}
+    \end{figure}
+    
+    \begin{itemize}
+        \item On an LLC access:
+        \begin{itemize}
+            \item The LLC forwards the XORed line \textbf{A $\oplus$ B} to the higher-level cache.
+            \item The higher-level cache XORs it with its local copy of \textbf{A} to recover \textbf{B}.
+        \end{itemize}
+        \item Lines in L1 are never XORed, so L1 hits incur no extra latency.
+    \end{itemize}
+\end{frame}
+
+
+
+\begin{frame} {XOR Cache: Advantage}
+
+\begin{itemize}
+    \item This design provides two benefits:
+    \begin{itemize}
+        \item \textbf{Storage reduction:} XORing two lines allows storing two values using one LLC entry.
+        \item \textbf{Higher compressibility:} If A and B are similar, \textbf{A $\oplus$ B} has lower entropy and becomes more compressible under other compression schemes.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Implementation of XOR Cache}
+      The the implementation consists of 2 major components:  
+      \begin{enumerate}
+          \item Xor Compressor
+          \item Xor De compressor
+          
+          
+      \end{enumerate}
+\end{frame}
+
+
+
+\begin{frame}{XOR Cache: XOR Compressor}
+
+    It compresses a cache line by XOR-ing each chunk with the previous chunk.
+    
+            {\tiny
+                \[
+                \begin{array}{c@{\qquad}c@{\qquad}c}
+                    \textbf{Original Chunks} & & \textbf{XOR-Encoded Chunks} \\[4pt]
+                    
+                    \begin{array}{|c|}
+                        \hline
+                        \text{chunk[0]} \\ \hline
+                        \text{chunk[1]} \\ \hline
+                        \text{chunk[2]} \\ \hline
+                        \text{chunk[3]} \\ \hline
+                        \vdots \\ \hline
+                    \end{array}
+                    &
+                    \Longrightarrow
+                    &
+                    \begin{array}{|c|}
+                        \hline
+                        \text{xor\_chunk[0] = chunk[0]} \\ \hline
+                        \text{xor\_chunk[1] = chunk[1] $\oplus$ chunk[0]} \\ \hline
+                        \text{xor\_chunk[2] = chunk[2] $\oplus$ chunk[1]} \\ \hline
+                        \text{xor\_chunk[3] = chunk[3] $\oplus$ chunk[2]} \\ \hline
+                        \vdots \\ \hline
+                    \end{array}
+                \end{array}
+                \]
+            }
+\end{frame}
+
+
+
+\begin{frame}{XOR Cache: XOR Compressor}
+
+    \begin{columns}
+    
+        \begin{column}{0.44\textwidth}
+        It compresses a cache line by XOR-ing each chunk with the previous chunk.
+        
+        \end{column}
+        \begin{column}{0.52\textwidth}
+            \begin{tcolorbox}[
+                enhanced jigsaw,
+                breakable,
+                colback=gray!10,
+                colframe=blue!60!black,
+                colbacktitle=blue!60!black,
+                coltitle=white,
+                title=Algorithm: Find 1 in $n$ Elements,
+                fonttitle=\bfseries
+            ]
+            {\footnotesize
+            \begin{algorithmic}
+            
+            \State Allocate array $A$ of size $n$, 
+            \State initialized every element to $0$
+            \medskip
+            \State $k = \text{rand()} \bmod n$
+            \State $A[k] = 1$
+            \medskip
+            \State $retIndex = -1$
+            
+            \For{$i = 0$ to $n-1$}
+                \If{$A[i] == 1$}
+                    \State $retIndex = i$
+                \EndIf
+            \EndFor
+            \medskip
+            \State \Return $retIndex$
+            
+            \end{algorithmic}
+            }
+            
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+
+\begin{frame}{XOR Cache: XOR De-compressor}
+    Decompression reconstructs each original chunk by XOR-ing the XOR-ed-chunk with the previously reconstructed chunk.
+
+          {\tiny
+            \[
+            \begin{array}{c@{\quad}c@{\quad}c}
+                \textbf{XOR-Encoded Chunks} & & \textbf{ Reconstructed Chunks} \\[4pt]
+                
+                \begin{array}{|c|}
+                    \hline
+                    \text xor\_chunk[0] \\ \hline
+                    \text xor\_chunk[1] \\ \hline
+                    \text xor\_chunk[2] \\ \hline
+                    \text xor\_chunk[3] \\ \hline
+                    \vdots \\ \hline
+                \end{array}
+                &
+                \Longrightarrow
+                &
+                \begin{array}{|c|}
+                    \hline
+                    \text {chunk[0] = xor\_chunk[0]} \\ \hline
+                    \text {chunk[1] = xor\_chunk[1] $\oplus$ chunk[0]} \\ \hline
+                    \text {chunk[2] = xor\_chunk[2] $\oplus$ chunk[1]} \\ \hline
+                    \text {chunk[3] = xor\_chunk[3] $\oplus$ chunk[2]} \\ \hline
+                    \vdots \\ \hline
+                \end{array}
+            \end{array}
+            \]
+            }
+\end{frame}
+
+
+
+\begin{frame}{XOR Cache: XOR De-compressor}
+
+    \begin{columns}
+    
+        \begin{column}{0.44\textwidth}
+        Decompression reconstructs each original chunk by XOR-ing the XOR-ed-chunk with the previously reconstructed chunk.
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \begin{tcolorbox}[
+                enhanced jigsaw,
+                breakable,
+                colback=gray!10,
+                colframe=blue!60!black,
+                colbacktitle=blue!60!black,
+                coltitle=white,
+                title= XOR\_DECOMPRESS,
+                fonttitle=\bfseries
+            ]
+            {\footnotesize
+            \begin{algorithmic}
+            
+            \State Allocate array $A$ of size $n$, 
+            \State initialized every element to $0$
+            \medskip
+            \State $k = \text{rand()} \bmod n$
+            \State $A[k] = 1$
+            \medskip
+            \State $retIndex = -1$
+            
+            \For{$i = 0$ to $n-1$}
+                \If{$A[i] == 1$}
+                    \State $retIndex = i$
+                \EndIf
+            \EndFor
+            \medskip
+            \State \Return $retIndex$
+            
+            \end{algorithmic}
+            }
+            
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+
+\begin{frame}{Tests \& Benchmarks}
+For testing we are going to use all the Gem5 benchmarks (i.e., blackscholes, bodytrack, ..., x264) in addition with 4 of our own smaller benchmarks for focusing on the functioning of the cache compression algorithm rather than cache performance in general.
+
+\medskip
+
+\begin{enumerate}
+    \item find\textit{1}In\textit{N}Elements
+    \item count\textit{5}sIn\textit{N}Elements
+    \item count\textit{5}sInRandom\textit{N}Elements
+    \item count\textit{5}sInSparse\textit{N}Elements
+\end{enumerate}
+\end{frame}
+
+
+
+\begin{frame}{Benchmarks - find\textit{1}In\textit{N}Elements}
+
+\begin{columns}
+
+\begin{column}{0.44\textwidth}
+This benchmark will fill an array with all zeroes except one random single value. It is then tasked to find the non-zero value.
+
+\medskip
+
+Ex:
+\medskip
+0 0 0 0 ... 1 0 0 ...
+\end{column}
+
+\begin{column}{0.52\textwidth}
+\begin{tcolorbox}[
+    enhanced jigsaw,
+    breakable,
+    colback=gray!10,
+    colframe=blue!60!black,
+    colbacktitle=blue!60!black,
+    coltitle=white,
+    title=Find 1 in $n$ Elements,
+    fonttitle=\bfseries
+]
+{\footnotesize
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$, 
+\State initialized every element to $0$
+\medskip
+\State $index = \text{rand()} \% n$
+\State $A[index] = 1$
+\medskip
+\State $retIndex = -1$
+
+\For{$i = 0$ to $n-1$}
+    \If{$A[i] == 1$}
+        \State $retIndex = i$
+    \EndIf
+\EndFor
+\medskip
+\State \Return $retIndex$
+
+\end{algorithmic}
+}
+
+\end{tcolorbox}
+
+\end{column}
+
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{Benchmarks - count\textit{5}sIn\textit{N}Elements}
+\begin{columns}
+\begin{column}{0.44\textwidth}
+This benchmark fills the array with sequentially increasing values. It is then tasked to count the number of 5s from within the array.
+
+\medskip
+
+Ex: 
+\medskip 
+1 2 3 4 5 ... 
+\end{column}
+
+\begin{column}{0.52\textwidth}
+\begin{tcolorbox}[
+    enhanced jigsaw,
+    breakable,
+    colback=gray!10,
+    colframe=blue!60!black,
+    colbacktitle=blue!60!black,
+    coltitle=white,
+    title=Find count of 5s in $n$ Elements,
+    fonttitle=\bfseries
+]
+{\footnotesize
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$
+
+\For{$i = 0$ to $n-1$}
+    \State$A[i] = i\%10$
+    \EndFor
+    
+\State fiveCount = 0
+
+\For{item $x$ in $A$}
+    \If{$x=5$}
+        \State fiveCount+=1
+    \EndIf
+
+\EndFor
+
+\State \Return fiveCount
+
+\end{algorithmic}
+}
+
+\end{tcolorbox}
+\end{column}
+
+\end{columns}
+    
+\end{frame}
+
+
+
+\begin{frame}{Benchmarks - count\textit{5}sInRandom\textit{N}Elements}
+
+
+\begin{columns}
+\begin{column}{0.44\textwidth}
+Fills array with random values and tasked with counting the number of 5s
+
+\medskip
+
+Ex: 
+\medskip 
+70 34 6 78 5 89 ...
+\end{column}
+
+\begin{column}{0.52\textwidth}
+
+\begin{tcolorbox}[
+    enhanced jigsaw,
+    breakable,
+    colback=gray!10,
+    colframe=blue!60!black,
+    colbacktitle=blue!60!black,
+    coltitle=white,
+    title=Count 5s in Random $n$ Elements,
+    fonttitle=\bfseries
+]
+{\footnotesize
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$, 
+\State initialized every element to $0$
+\medskip
+\For{$i = 0$ to $n-1$}
+    \State A[i] = $(\text{rand()}+1) \bmod 100$
+    \EndFor
+\medskip
+\State fiveCount = 0
+\For{$i = 0$ to $n-1$}
+    \If{$A[i]==5$}
+        \State fiveCount+=1
+    \EndIf
+    \EndFor
+\medskip
+\State \Return fiveCount
+
+\end{algorithmic}
+}
+
+\end{tcolorbox}
+
+\end{column}
+
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{Benchmarks - count\textit{5}sInSparse\textit{N}Elements}
+
+
+\begin{columns}
+\begin{column}{0.44\textwidth}
+This benchmark fills the array with a \%10 value every next 5th item in the array. Tasked with counting the number of 5s.
+
+\medskip
+
+Ex: 
+\medskip 
+0 0 0 0 5 0 ... 
+\end{column}
+
+\begin{column}{0.52\textwidth}
+\begin{tcolorbox}[
+    enhanced jigsaw,
+    breakable,
+    colback=gray!10,
+    colframe=blue!60!black,
+    colbacktitle=blue!60!black,
+    coltitle=white,
+    title=Find count of 5s in $n$ of \%10 Elements,
+    fonttitle=\bfseries
+]
+{\footnotesize
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$
+
+\For{$i = 0$ to $n-1$}
+    \If{$i\%10==5$}
+        \State $A[i]=i\%10$
+    \EndIf
+    \EndFor
+    
+\State fiveCount = 0
+
+\For{item $x$ in $A$}
+    \If{$x=5$}
+        \State fiveCount+=1
+    \EndIf
+
+\EndFor
+
+\State \Return fiveCount
+
+\end{algorithmic}
+}
+
+\end{tcolorbox}
+\end{column}
+
+\end{columns}
+    
+\end{frame}
+
+
+
+\begin{frame}{Expected Results}
+    
+\end{frame}
+
+
+
+\begin{frame}{Challenges}
+
+    
+\end{frame}
+
+
+
+\begin{frame}{Where We Are Now – Timeline}
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=\textwidth]{Timeline.png}
+        \label{fig:myfigure}
+    \end{figure}
+\end{frame}
+
+
+
+\begin{frame}{Future Work}
+    \begin{itemize}
+        \item Run XOR cache on all gem5 benchmarks
+        
+    \end{itemize}
+\end{frame}
+
+
 
 \begin{frame}[allowframebreaks]{References} 
     \nocite{*}
     \bibliographystyle{unsrt}
     \bibliography{reference}
 \end{frame}
+
 \end{document}
