@@ -86,7 +86,7 @@ Vary by \textbf{Granularity}:
 
 \begin{itemize}
     \item Base-Delta Immediate \footnote{\fontsize{6pt}{4pt}\selectfont Gennady Pekhimenko, Vivek Seshadri, Onur Mutlu, Phillip B. Gibbons, Michael A. Kozuch, and Todd C. Mowry. Base-delta-immediate compression: practical data compression for on-chip caches. PACT 2012.}: Leverage small differences between values stored in a cache line. Represent cache lines in more compact form; use base values and an array of differences between values. (intra-line)
-    \item Base and Compressed Difference Deduplication \footnote{\fontsize{6pt}{4pt}\selectfont Sungbo Park, Ingab Kang, Yaebin Moon, Jung Ho Ahn, and G. Edward Suh. Bcd deduplication: effective memory compression using partial cache-line deduplication. ASPLOS 2021.}: Makes use of partial matches across blocks; high bits tend to have common values across blocks even if they are different within blocks. Series of compression and deduplication of partially matching blocks. (inter-line)
+    \item Base and Compressed Difference Deduplication \footnote{\fontsize{6pt}{4pt}\selectfont Sungbo Park, Ingab Kang, Yaebin Moon, Jung Ho Ahn, and G. Edward Suh. Bcd deduplication: effective memory compression using partial cache-line deduplication. ASPLOS 2021.}: Makes use of partial matches across blocks; high bits tend to have common values acorss blocks even if they are different within blocks. Series of compression and deduplication of partially matching blocks. (inter-line)
 \end{itemize}
 
 \medskip
@@ -158,7 +158,7 @@ Making use of both intra and inter-line redundancy, we chose to implement the \t
 
 
 \begin{frame}{Implementation of XOR Cache}
-      The the implementation consists of 2 major components:  
+      The implementation consists of 2 major components:  
       \begin{enumerate}
           \item Xor Compressor
           \item Xor De compressor
@@ -206,13 +206,6 @@ Making use of both intra and inter-line redundancy, we chose to implement the \t
 
 \begin{frame}{XOR Cache: XOR Compressor}
 
-    \begin{columns}
-    
-        \begin{column}{0.44\textwidth}
-        It compresses a cache line by XOR-ing each chunk with the previous chunk.
-        
-        \end{column}
-        \begin{column}{0.52\textwidth}
             \begin{tcolorbox}[
                 enhanced jigsaw,
                 breakable,
@@ -220,34 +213,42 @@ Making use of both intra and inter-line redundancy, we chose to implement the \t
                 colframe=blue!60!black,
                 colbacktitle=blue!60!black,
                 coltitle=white,
-                title=Algorithm: Find 1 in $n$ Elements,
+                title=XOR\_COMPRESS,
                 fonttitle=\bfseries
             ]
             {\footnotesize
             \begin{algorithmic}
             
-            \State Allocate array $A$ of size $n$, 
-            \State initialized every element to $0$
-            \medskip
-            \State $k = \text{rand()} \bmod n$
-            \State $A[k] = 1$
-            \medskip
-            \State $retIndex = -1$
-            
-            \For{$i = 0$ to $n-1$}
-                \If{$A[i] == 1$}
-                    \State $retIndex = i$
-                \EndIf
+            \State $N = \text{length}(chunks)$
+            \State $\text{data} = \text{new CompressionData}(N)$
+        
+            \If{$N = 0$}
+                \State $\text{comp\_lat} \gets 0$
+                \State $\text{decomp\_lat} \gets 0$
+                \State \Return data
+            \EndIf
+        
+            \State $\text{data.xor}[0] \gets chunks[0]$
+        
+            \For{$i = 1$ to $N-1$}
+                \State $\text{data.xor}[i] \gets chunks[i] \oplus chunks[i-1]$
             \EndFor
-            \medskip
-            \State \Return $retIndex$
-            
+        
+            \State $\text{data.sizeBits} \gets N \times \text{chunkSizeBits}$
+        
+            \State $\text{comp\_lat} \gets 
+                    \lceil N / \text{compChunksPerCycle} \rceil 
+                    + \text{compExtraLatency}$
+        
+            \State $\text{decomp\_lat} \gets 
+                    \lceil N / \text{decompChunksPerCycle} \rceil
+                    + \text{decompExtraLatency}$
+        
+            \State \Return data
             \end{algorithmic}
             }
             
-            \end{tcolorbox}
-        \end{column}
-    \end{columns}
+        \end{tcolorbox}
 \end{frame}
 
 
@@ -596,12 +597,5 @@ Ex:
     \end{itemize}
 \end{frame}
 
-
-
-\begin{frame}[allowframebreaks]{References} 
-    \nocite{*}
-    \bibliographystyle{unsrt}
-    \bibliography{reference}
-\end{frame}
 
 \end{document}
