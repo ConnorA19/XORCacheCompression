@@ -63,8 +63,8 @@ Compression techniques are utilized in many facets of computing, increasing the 
 \end{frame}
 
 
-
-\begin{frame}{Motivation - Cache Compression}
+\begin{comment}
+   \begin{frame}{Motivation - Cache Compression}
 Cache Compression Goal: condense larger chunks of data into smaller blocks without losing any information
 
 \medskip
@@ -74,11 +74,13 @@ Why cache compression?
     \item Benefits of increasing cache size without latency concerns or other losses that can occur from larger cache sizes
 \end{itemize}
     
-\end{frame}
+\end{frame} 
+\end{comment}
 
 
 
-\begin{frame}{Motivation - Scholarship}
+
+\begin{frame}{Motivation - Granularity in Scholarship}
 
 Vary by \textbf{Granularity}: 
 
@@ -338,6 +340,8 @@ Making use of both intra and inter-line redundancy, we chose to implement the \t
 \begin{frame}{Tests \& Benchmarks}
 For testing we are going to use all the Gem5 benchmarks (i.e., blackscholes, bodytrack, ..., x264) in addition with 4 of our own smaller benchmarks for focusing on the functioning of the cache compression algorithm rather than cache performance in general.
 
+
+
 \medskip
 
 \begin{enumerate}
@@ -346,6 +350,10 @@ For testing we are going to use all the Gem5 benchmarks (i.e., blackscholes, bod
     \item count\textit{5}sInRandom\textit{N}Elements
     \item count\textit{5}sInSparse\textit{N}Elements
 \end{enumerate}
+
+\medskip
+
+\textit{Note: }Cache size intentionally kept small to improve likelihood of compression events
 \end{frame}
 
 
@@ -523,7 +531,7 @@ Ex:
 
 \begin{columns}
 \begin{column}{0.44\textwidth}
-This benchmark fills the array with a \%10 value every next 5th item in the array. Tasked with counting the number of 5s.
+This benchmark fills the array with an item every next 5th item in the array. Tasked with counting the number of 5s.
 
 \medskip
 
