@@ -86,7 +86,7 @@ Vary by \textbf{Granularity}:
 
 \begin{itemize}
     \item Base-Delta Immediate \footnote{\fontsize{6pt}{4pt}\selectfont Gennady Pekhimenko, Vivek Seshadri, Onur Mutlu, Phillip B. Gibbons, Michael A. Kozuch, and Todd C. Mowry. Base-delta-immediate compression: practical data compression for on-chip caches. PACT 2012.}: Leverage small differences between values stored in a cache line. Represent cache lines in more compact form; use base values and an array of differences between values. (intra-line)
-    \item Base and Compressed Difference Deduplication \footnote{\fontsize{6pt}{4pt}\selectfont Sungbo Park, Ingab Kang, Yaebin Moon, Jung Ho Ahn, and G. Edward Suh. Bcd deduplication: effective memory compression using partial cache-line deduplication. ASPLOS 2021.}: Makes use of partial matches across blocks; high bits tend to have common values acorss blocks even if they are different within blocks. Series of compression and deduplication of partially matching blocks. (inter-line)
+    \item Base and Compressed Difference Deduplication \footnote{\fontsize{6pt}{4pt}\selectfont Sungbo Park, Ingab Kang, Yaebin Moon, Jung Ho Ahn, and G. Edward Suh. Bcd deduplication: effective memory compression using partial cache-line deduplication. ASPLOS 2021.}: Makes use of partial matches across blocks; high bits tend to have common values across blocks even if they are different within blocks. Series of compression and deduplication of partially matching blocks. (inter-line)
 \end{itemize}
 
 \medskip
