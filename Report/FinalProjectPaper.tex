@@ -1,0 +1,117 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{makecell}
+
+\title{ XOR Cache Compression}
+\author{
+\IEEEauthorblockN{
+Imran Aliji,
+Connor Antony,
+Lila Craveiro,
+Zannatun Naim Sristy}
+\IEEEauthorblockA{
+Department of Computer Science and Engineering, University of Minnesota\\
+Email: \{aliji001, anton386, crave112, srist001\}@umn.edu}
+}
+
+
+
+\begin{document}
+\maketitle
+
+\section{Paper Plan}
+Sections to include in paper:
+\begin{enumerate}
+    \item Abstract
+    \item Introduction
+    \item Related Works
+    \item XOR Cache (High Level Overview of Architecture)
+    \item Implementation of XOR Cache (how we went about actually implementing it)
+    \item Benchmarks and Metrics for Testing
+    \item Results
+    \item Conclusion/Discussion
+\end{enumerate}
+
+\section{Project Description}
+At its core, computing is the transfer of information and as time goes on, the amount of data we collect, process, and store grows. This presents a key challenge of how to utilize the resources you have as efficiently as possible so that you consume less power. This problem compounds as we take a look at the world of computing and how a few speed-ups on some algorithms have saved billions of dollars in energy use worldwide. One method that helps our compute performance is compression. The goal of compression is to take a larger chunk of data and condense them to take up less space. More importantly, we can move this information faster when it takes up less space because it takes up less bandwidth. Today's processors have dedicated space on their die built for fast access SRAM for caching purposes. The CPU cache is one of its most powerful tools for quickly accessing local memory, much faster than typical RAM accesses. However, a processor's die can only fit so many components, making the placement of each unit compromise the compute efficiency in some way. Knowing this, cache compression has been an avenue through which we can squeeze more power out of processors while utilizing fewer resources. 
+
+The goal of our project is to increase compute efficiency by utilizing compression techniques on a processors cache. Our plan is to utilize different types of compression techniques from the available literature on the topic and to analyze the results and see what steps can be taken to improve further. Some important metrics that we will be measuring include cache hits/misses, the cycles-per-instruction, and check if the data matches after decompression.
+
+\section{Literature Review}
+Cache compression is a prolific branch of research in the pursuit of improving cache performance. Cache compression allows for the benefits that come with increasing cache size without any of the latency or other challenges that arise from large cache size \cite{Understanding_Cache_Compression}. This method works by compressing lines upon insertion and decompressing them upon access. While the higher level idea behind cache compression is the same, methods of cache compression defer by their chosen cache compaction scheme. This scheme defines the decisions made by the technique that explain why, when, how, and where compression is being applied and the data is placed after compression \cite{Understanding_Cache_Compression}. 
+
+There are a number of factors that go into a method's cache compaction scheme. These factors define the ways in which cache compression methods address the handling of data and mapping of compressed data. Some factors include expansion, mapping, and tag optimization. Carvalho and Seznec \cite{Understanding_Cache_Compression} describe these concepts as follows: 
+
+\textit{Expansion}: actions taken when a compressed block experiences a fat write
+
+\textit{Mapping}: mapping between tag and data storages
+
+\textit{Tag Optimization}: optimization quality of tag representation
+
+In addition to these defining features, another significant factor of a cache's compaction scheme is its \textit{Granularity}. Granularity defines where deduplication occurs: between values in a line, or between the lines themselves. There are benefits to both types of compression, but they also need not be done in isolation. Some compression methods, like XOR Cache \cite{The_XOR_Cache}, make use of both methods, taking advantage of the benefits of both schemes.
+
+\subsection{Intra-Line Compression}
+Intra-line cache compression strategies primarily concentrate on reducing individual cache blocks by avoiding repetitive patterns or slight value variances inside a single line in order to get around the limited Last-Level Cache (LLC) capacity. Traditional data cache compressors such as Frequent Pattern Compression (FPC) \cite{Frequent_Pattern_Compression} and Base-Delta-Immediate (BDI) \cite{Base-delta-immediate_compression} use the idea that the data values stored within the line often exhibit low value differences. They use a common base value plus an array of relative differences to compress the cache line, whose combined size is much smaller than the original cache line. Hybrid intra-line compression approaches, on the other hand, such as HyComp \cite{HyComp} further exploit value locality of multiple data types by selecting among several compression algorithms (e.g., BDI \cite{Base-delta-immediate_compression}, Huffman-based schemes \cite{SC2}) based on detected semantic characteristics within the line. Even recent domain-specific schemes such as Ecco \cite{Ecco} build upon traditional Huffman-based schemes \cite{SC2} with augmentation of group-wise and non-uniform quantization with pre-defined shared k-means patterns to exploit the inherent entropy characteristics of LLM cache data. In contrast, Base-Victim Compression (BVC) \cite{Base-victim_compression} uses two tags: a base line - the line that would exist without compression - and a victim line - the line kept in place if able to be compressed to fit an existing base line - to achieve the same hit rate of an uncompressed cache.
+
+Even though intra-line approaches greatly improve the LLC capacity, they are unable to take advantage of structural similarities across various blocks since they operate independently on each cache line. This motivates inter-line techniques and layered hybrid approaches which build on traditional intra-line compression while additionally exploiting cross-line structural correlation to further expand usable capacity.
+
+
+\subsection{Inter-Line Compression}
+While intra-line cache compression reduces data size by exploiting internal line patterns, inter-line compression leverages similarity across multiple cache lines to further reduce redundancy and increase usable cache space. For example, Deduplication \cite{Last-level_cache_deduplication} performs hash-based, post-process duplicate detection to eliminate repeated values at the cache-line granularity and maps all duplicate tags to a single stored copy with limited overhead. Although it effectively increases cache capacity and improves average performance, it is brittle to small differences in data values. 
+
+In contrast, Doppelgänger \cite{Doppelganger} proposes an approximate similarity-sharing technique in which multiple tags may point to a single representative data entry if pairwise element differences stay within a threshold. Rather than explicitly compare values, Bunker Cache \cite{Bunker_Cache} uses the idea that blocks at periodic addresses tend to be similar and remaps such addresses to the same cache location. However, these similarity approximation mechanisms are only feasible in error-tolerant domains such as vision or signal processing. To relax all-bit equality while remaining lossless, BCD \cite{BCD_deduplication}  stores the common high bits once and encodes the high-entropy lower bits. Relative to cache-line compression alone, it markedly increases compression while keeping performance overhead small. EPC \cite{Exploiting_Inter-block_Entropy} generalizes this direction by mining recurring low-entropy regions across many blocks and using pattern-based extraction. 
+
+However,  neither intra-line nor inter-line compression alone can fully address the cache redundancy due to their complementary strengths. And these motivate a new thread of research that combines both to maximize effective cache capacity.
+
+\subsection{Taking advantage of both}
+As redundancy can occur within and across cache lines, recent research has explored hybrid compression mechanisms that exploit both granularities to further advance the cache capacity. Dictionary Sharing \cite{Dictionary_sharing} improves inter-line compaction by extracting distinct 4-byte chunks from neighboring blocks and storing them in a shared dictionary by exploiting both content locality and upper-bit similarity. Both 2DCC \cite{2DCC} and Thesaurus \cite{Thesaurus} simultaneously exploits inter-line deduplication and intra-line compression using a hashing and locality-sensitive hashing (LSH) accordingly, where duplicates or similar clusters are replaced with references and then unique blocks are compressed. Unlike prior designs, XOR Cache \cite{The_XOR_Cache} extends hybrid compression by storing the bitwise XOR of similar line pairs, layered on top of traditional intra-line techniques. This reduces the storage demand by half with minimal performance loss.
+
+\section{Work Plan}
+\subsection{Overview}
+\begin{enumerate}
+    \item \textbf{Algorithm Design:} We will begin by designing a cache compression algorithm that we believe can give significant efficiency or performance enhancements on a set of workloads.
+    \item \textbf{Algorithm Implementation:} We will implement our algorithm into a simulator (most likely gem5) and generate a way to implement our cache with our workload for testing
+    \item \textbf{Testing:} Implementing our algorithm into the simulator, we will produce efficiency (hit rate) and performance (CPU time) results.
+    \item \textbf{Recording:} We will record and document our findings while creating easy to read graphs and tables to convey our quantitative findings.
+\end{enumerate}
+\subsection{Work load}
+\subsubsection{Development}
+We can develop a very simple benchmark (such as multiplying an $n \times n$ matrix) to work on our development and fine tuning of the algorithm to get speedups we desire.
+\subsubsection{Standard}
+We will focus primarily on the PARSEC benchmark suite \cite{Parsec}.  This will allow us to have a way to compare our compression algorithms to many others, as through our literature review we found that many algorithms use the parsec benchmark.  The parsec benchmark will allow us to have a real world multi-threaded benchmark so we can focus on building multi-threaded speedups.  As more computers adapt more cores and threads, the parsec benchmark will allow us to view a relevant benchmark.
+\subsubsection{Real World}
+While standard benchmarks are important, many efficiency increases only matter if they are applicable to the real world.  We can use gcc as a bench mark if we use gem5 and input a program to be compiled using our cache algorithm with "gcc" and "gcc -jn" to check the speedups per thread count. This will only be done if we believe that our benchmark is not satisfactory in gathering all the information we need, or if we have the extra time to develop it.
+\subsection{Comparison}
+Our comparison against other algorithms will consist of timing the performance and tracking the efficiency of the algorithm against the standard benchmark.  Using this data, we will utilize python to create visualizations to compare our results with.
+
+% \textbf{XOR Paper Notes 2025 \cite{The_XOR_Cache}}\\
+
+% - leverage redundancy that comes from private caching and inclusion\\
+% - increasing cache size is not the best solution to cache performance - high access latency\\
+% - cache compression compresses lines upon insertion and decompresses upon access\\
+% - XOR cache spans multiple caches\\
+% - inclusive cache hierarchies introduce data redundancy\\
+% - In xor, an inclusive cache line can xor with another line from a lower level as a single line $A\oplus B$. On access, the line is sent forward to the higher level cache, and XORed again to reverse the compression\\
+% - lines in L1s are never XORed, L1 hits do not impose extra latency\\
+% - typical cache compression methods exploit redundancy within a single cache level - extra opportunities for compression across level boundary not being utilized in other methods - inter-line compression\\
+% - leverages redundancy due to private caching to decompress data via forwarding between the private caches\\
+% - XOR uses both types of redundancy when compressing\\
+% - cache compression separated into intra- and inter-line based on compression granularity: intra-captures value similarity within a single memory or cache line; inter- compress multiple similar lines and store only one copy, along with additional metadata\\
+% - XOR stores bitwise XOR results of line pairs - symmetrical compression and decompression\\
+% - opportunistic XOR policy that allows for compression when any candidate is available, or synergistic policy: similar lines allowed to XOR together 
+% - tests show that XOR saves significant power and area with minimal performance loss\\
+% - XOR has 26.3\% lower energy delay product than the uncompressed baseline\\
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{reference}
+
+\end{document}
