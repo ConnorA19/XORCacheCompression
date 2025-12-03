@@ -46,8 +46,8 @@ There are 4 benchmarks for testing the program. Each has a differently composed 
 
 1. Fill array with all zeroes except one random single value, find non-zero value
 2. Fill array with sequentially increasing values, count the number of 5's
-3. Fill array with random values % 10, count the number of 5's
-4. Fill array with a 5 every 10th value of zeroes
+3. Fill array with random values, count the number of 5's
+4. Fill array with an item every next 5th item, count the number of 5's
 
 # Testing Benchmarks
 To run all benchmarks:
