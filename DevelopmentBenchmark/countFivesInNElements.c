@@ -3,6 +3,7 @@
 #include <time.h>
 void countFivesInNElements(const int n){
     printf("Running Test 1\n");
+    //int* array = calloc(n, sizeof(int));
     int* array = calloc(n, sizeof(int));
 
     //Go through all values and add increasing values

@@ -75,7 +75,7 @@ cache_hierarchy = OctopiCache(
     is_fullsystem=True,
 )
 
-memory = DualChannelDDR4_2400(size="16GiB")
+memory = DualChannelDDR4_2400(size="16GB")
 
 # The number of cores must be consistent with
 # num_core_complexes and num_cores_per_core_complexes
@@ -97,9 +97,7 @@ board = ArmBoard(
     platform=platform,
 )
 
-board.set_workload(
-    obtain_resource("arm64-ubuntu-20.04-boot", resource_version="2.0.0")
-)
+board.set_workload(obtain_resource("arm64-ubuntu-20.04-boot"))
 
 simulator = Simulator(board=board)
 simulator.run()

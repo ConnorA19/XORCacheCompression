@@ -176,6 +176,6 @@ class JSONClientTestSuite(unittest.TestCase):
             json = client.get_resources_json()
 
         self.assertTrue(
-            f"'{path}' is not a valid file path or URL"
+            f"Resources location '{path}' is not a valid path or URL."
             in str(context.exception)
         )

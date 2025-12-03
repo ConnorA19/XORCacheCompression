@@ -21,9 +21,7 @@
         "source_url": "https://github.com/gem5/gem5-resources/tree/develop/src/asmtest",
         "resource_version": "1.0.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "example_usage": "get_resource(resource_name=\"rv64mi-p-sbreak\")"
     },
@@ -50,9 +48,7 @@
         "source_url": "https://github.com/gem5/gem5-resources/tree/develop/src/asmtest",
         "resource_version": "1.1.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "example_usage": "get_resource(resource_name=\"rv64mi-p-sbreak\")"
     },
@@ -98,9 +94,7 @@
         "source_url": "",
         "resource_version": "1.0.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "workload_name": "x86-print-this-15000-with-simpoints",
         "example_usage": "get_resource(resource_name=\"x86-print-this-1500-simpoints\")",
@@ -128,9 +122,7 @@
         "source_url": "",
         "resource_version": "0.2.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "workload_name": "x86-print-this-15000-with-simpoints",
         "example_usage": "get_resource(resource_name=\"x86-print-this-1500-simpoints\")",
@@ -158,9 +150,7 @@
         "source_url": "",
         "resource_version": "0.2.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "workload_name": "x86-print-this-15000-with-simpoints",
         "example_usage": "get_resource(resource_name=\"x86-print-this-1500-simpoints\")",
@@ -188,9 +178,7 @@
         "source_url": "",
         "resource_version": "0.2.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "workload_name": "x86-print-this-15000-with-simpoints",
         "example_usage": "get_resource(resource_name=\"x86-print-this-1500-simpoints\")",
@@ -218,9 +206,7 @@
         "source_url": "",
         "resource_version": "0.2.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "workload_name": "x86-print-this-15000-with-simpoints",
         "example_usage": "get_resource(resource_name=\"x86-print-this-1500-simpoints\")",
@@ -248,9 +234,7 @@
         "source_url": "",
         "resource_version": "0.2.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "workload_name": "x86-print-this-15000-with-simpoints",
         "example_usage": "get_resource(resource_name=\"x86-print-this-1500-simpoints\")",
@@ -278,9 +262,7 @@
         "source_url": "",
         "resource_version": "0.2.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "workload_name": "x86-print-this-15000-with-simpoints",
         "example_usage": "get_resource(resource_name=\"x86-print-this-1500-simpoints\")",
@@ -308,9 +290,7 @@
         "source_url": "",
         "resource_version": "0.2.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "workload_name": "x86-print-this-15000-with-simpoints",
         "example_usage": "get_resource(resource_name=\"x86-print-this-1500-simpoints\")",
@@ -342,9 +322,7 @@
         "source_url": "https://github.com/gem5/gem5-resources/tree/develop/src/x86-ubuntu",
         "resource_version": "2.0.0",
         "gem5_versions": [
-            "develop",
-            "24.0",
-            "24.1"
+            "develop"
         ],
         "example_usage": "get_resource(resource_name=\"x86-ubuntu-18.04-img\")"
     }

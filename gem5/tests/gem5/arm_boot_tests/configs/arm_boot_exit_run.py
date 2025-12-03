@@ -93,25 +93,6 @@ parser.add_argument(
     help="The python class for the memory interface to use",
 )
 
-systemd_group = parser.add_mutually_exclusive_group(required=True)
-systemd_group.add_argument(
-    "--systemd",
-    action="store_true",
-    help="Enable systemd on boot.",
-)
-systemd_group.add_argument(
-    "--no-systemd",
-    action="store_true",
-    help="Disable systemd on boot.",
-)
-
-parser.add_argument(
-    "--systemd",
-    action="store_true",
-    default=False,
-    help="Enable systemd on boot.",
-)
-
 parser.add_argument(
     "-t",
     "--tick-exit",
@@ -154,7 +135,7 @@ elif args.mem_system == "chi":
     )
 
     cache_hierarchy = PrivateL1CacheHierarchy(
-        size="16KiB",
+        size="16kB",
         assoc=4,
     )
 
@@ -165,11 +146,11 @@ elif args.mem_system == "mesi_two_level":
     )
 
     cache_hierarchy = MESITwoLevelCacheHierarchy(
-        l1d_size="32KiB",
+        l1d_size="32kB",
         l1d_assoc=8,
-        l1i_size="32KiB",
+        l1i_size="32kB",
         l1i_assoc=8,
-        l2_size="256KiB",
+        l2_size="256kB",
         l2_assoc=16,
         num_l2_banks=2,
     )
@@ -180,7 +161,7 @@ elif args.mem_system == "mi_example":
         MIExampleCacheHierarchy,
     )
 
-    cache_hierarchy = MIExampleCacheHierarchy(size="32KiB", assoc=4)
+    cache_hierarchy = MIExampleCacheHierarchy(size="32kB", assoc=4)
 else:
     raise NotImplementedError(
         f"Memory type '{args.mem_system}' is not supported in the boot tests."
@@ -220,24 +201,27 @@ board = ArmBoard(
 )
 
 # Set the Full System workload.
-board.set_workload(
-    obtain_resource(
-        (
-            "arm-ubuntu-24.04-boot-with-systemd"
-            if args.systemd
-            else "arm-ubuntu-24.04-boot-no-systemd"
-        ),
+board.set_kernel_disk_workload(
+    kernel=obtain_resource(
+        "arm64-linux-kernel-5.4.49",
         resource_directory=args.resource_directory,
-        resource_version=("3.0.0" if args.systemd else "2.0.0"),
+    ),
+    bootloader=obtain_resource(
+        "arm64-bootloader-foundation",
+        resource_directory=args.resource_directory,
+    ),
+    disk_image=obtain_resource(
+        "arm64-ubuntu-20.04-img",
+        resource_directory=args.resource_directory,
     ),
 )
 
 simulator = Simulator(board=board)
 
 if args.tick_exit:
-    simulator.set_max_ticks(args.tick_exit)
-
-simulator.run()
+    simulator.run(max_ticks=args.tick_exit)
+else:
+    simulator.run()
 
 print(
     "Exiting @ tick {} because {}.".format(

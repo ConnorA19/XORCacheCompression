@@ -35,7 +35,7 @@ import m5
 
 # import all of the SimObjects
 from m5.objects import *
-
+from m5.objects import TimingSimpleCPU
 # Add the common scripts to our path
 m5.util.addToPath('../../')
 
@@ -43,15 +43,16 @@ m5.util.addToPath('../../')
 from BaselineCaches import *
 
 # import the SimpleOpts module
-from common import SimpleOpts
+# from common import SimpleOpts
 
 # Running Benchmark
 thispath = os.path.dirname(os.path.realpath(__file__))
-default_binary = os.path.join(thispath, '../../../', 'tests/test-progs/DevelopmentBenchmark/x86Linux/developmentBenchmark')
+default_binary = os.path.join(thispath, '../../../../', 'tests/test-progs/DevelopmentBenchmark/x86Linux/developmentBenchmark')
 
 # Binary to execute
 SimpleOpts.add_option('binary', nargs=1)
 SimpleOpts.add_option('-n', nargs=1)
+SimpleOpts.add_option('-a', nargs=1)
 
 # Finalize the arguments and grab the args so we can pass it on to our objects
 args = SimpleOpts.parse_args()
@@ -59,55 +60,63 @@ args.binary = os.path.join(thispath, '../../../', args.binary[0])
 
 # create the system we are going to simulate
 system = System()
-
-# Set the clock frequency of the system (and all of its children)
 system.clk_domain = SrcClockDomain()
-system.clk_domain.clock = '1GHz'
+system.clk_domain.clock = '2GHz'
 system.clk_domain.voltage_domain = VoltageDomain()
 
-# Set up the system
-system.mem_mode = 'timing'  # Use timing accesses
-system.mem_ranges = [AddrRange('512MiB')]  # Create an address range
+system.mem_mode = 'timing'
+system.mem_ranges = [AddrRange('256MiB')]
 
-# Create a simple CPU
+# Create a CPU
 system.cpu = X86TimingSimpleCPU()
 
-# Create an L1 instruction and data cache
-system.cpu.icache = L1ICache(args)
-system.cpu.dcache = L1DCache(args)
+# Create the L1 data cache with FPC compression
+if not args.a[0] == "None":
+    tags = CompressedTags()
+    if args.a[0] == "FPC":
+        compressor = Compressors.FPC()
+    elif args.a[0] == "Zero":
+        compressor = Compressors.ZeroCompressor()
+    elif args.a[0] == "XOR":
+        compressor = Compressors.Xor()
+    l1d = L1DCache()
+    #l1d.tags.num_blocks_per_sector = 1
+    l1d.compressor = compressor
+    l1d.tags = tags
+    l1d.tags.block_size = 64
+    l1d.tags.max_compression_ratio = 2  # Allow compression
+else:
+    l1d = L1DCache()
+system.cpu.dcache = l1d
+system.cpu.icache = L1ICache()
 
-# Connect the instruction and data caches to the CPU
-system.cpu.icache.connectCPU(system.cpu)
-system.cpu.dcache.connectCPU(system.cpu)
-
-# Create a memory bus
+# Connect cache to CPU and bus
 system.membus = SystemXBar()
+l1d.connectCPU(system.cpu)
+system.cpu.icache.connectCPU(system.cpu)
+l1d.connectBus(system.membus)
+system.cpu.icache.connectBus(system.membus)
 
-# Connect the L2 cache to the membus
-system.cpu.icache.connectMem(system.membus)
-system.cpu.dcache.connectMem(system.membus)
 
-# create the interrupt controller for the CPU
+# Interrupt controller
 system.cpu.createInterruptController()
 system.cpu.interrupts[0].pio = system.membus.mem_side_ports
 system.cpu.interrupts[0].int_requestor = system.membus.cpu_side_ports
 system.cpu.interrupts[0].int_responder = system.membus.mem_side_ports
 
-# Connect the system up to the membus
 system.system_port = system.membus.cpu_side_ports
 
-# Create a DDR3 memory controller
 system.mem_ctrl = MemCtrl()
 system.mem_ctrl.dram = DDR3_1600_8x8()
 system.mem_ctrl.dram.range = system.mem_ranges[0]
 system.mem_ctrl.port = system.membus.mem_side_ports
 
 system.workload = SEWorkload.init_compatible(args.binary)
-
 # Create a process for a simple "Hello World" application
 process = Process()
 # Set the command
 # cmd is a list which begins with the executable (like argv)
+#process.cmd = [args.binary, args.n[0]]
 process.cmd = [args.binary, args.n[0]]
 # Set the cpu to use the process as its workload and create thread contexts
 system.cpu.workload = process
@@ -117,7 +126,6 @@ system.cpu.createThreads()
 root = Root(full_system=False, system=system)
 # instantiate all of the objects we've created above
 m5.instantiate()
-
 print(f'Beginning simulation!')
 exit_event = m5.simulate()
 print(f'Exiting @ tick {m5.curTick()} because {exit_event.getCause()}')

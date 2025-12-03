@@ -40,7 +40,6 @@ from m5.objects import *
 from m5.util import addToPath
 
 from gem5.isas import ISA
-from gem5.resources.resource import obtain_resource
 from gem5.runtime import get_supported_isas
 
 addToPath("../")
@@ -50,7 +49,6 @@ from common import (
     FileSystemConfig,
     GPUTLBConfig,
     GPUTLBOptions,
-    ObjectList,
     Options,
     Simulation,
 )
@@ -296,21 +294,6 @@ parser.add_argument(
     help="Latency for scalar responses from ruby to the cu.",
 )
 
-parser.add_argument(
-    "--memtime-latency",
-    type=int,
-    # Set to a default of 41 from micro-benchmarks
-    default=41,
-    help="Latency for memtimes in scalar memory pipeline.",
-)
-parser.add_argument(
-    "--mfma-scale",
-    type=float,
-    # Set to a default of 1 to not scale MFMA cycles
-    default=1,
-    help="Scale how long an MFMA instruction reserves the matrix core unit",
-)
-
 parser.add_argument("--TLB-prefetch", type=int, help="prefetch depth for TLBs")
 parser.add_argument(
     "--pf-type",
@@ -352,12 +335,6 @@ parser.add_argument(
     default="dynamic",
     help="register allocation policy (simple/dynamic)",
 )
-parser.add_argument(
-    "--register-file-cache-size",
-    type=int,
-    default=0,
-    help="number of registers in cache",
-)
 
 parser.add_argument(
     "--dgpu",
@@ -392,50 +369,9 @@ parser.add_argument(
 parser.add_argument(
     "--gfx-version",
     type=str,
-    default="gfx902",
+    default="gfx801",
     choices=GfxVersion.vals,
     help="Gfx version for gpuNote: gfx902 is not fully supported by ROCm",
-)
-
-parser.add_argument(
-    "--tcp-rp",
-    type=str,
-    default="TreePLRURP",
-    choices=ObjectList.rp_list.get_names(),
-    help="cache replacement policy" "policy for tcp",
-)
-
-parser.add_argument(
-    "--tcc-rp",
-    type=str,
-    default="TreePLRURP",
-    choices=ObjectList.rp_list.get_names(),
-    help="cache replacement policy" "policy for tcc",
-)
-
-# sqc rp both changes sqc rp and scalar cache rp
-parser.add_argument(
-    "--sqc-rp",
-    type=str,
-    default="TreePLRURP",
-    choices=ObjectList.rp_list.get_names(),
-    help="cache replacement policy" "policy for sqc",
-)
-
-parser.add_argument(
-    "--download-resource",
-    type=str,
-    default=None,
-    required=False,
-    help="Download this resources prior to simulation",
-)
-
-parser.add_argument(
-    "--download-dir",
-    type=str,
-    default=None,
-    required=False,
-    help="Download resources to this directory",
 )
 
 Ruby.define_options(parser)
@@ -444,17 +380,6 @@ Ruby.define_options(parser)
 GPUTLBOptions.tlb_options(parser)
 
 args = parser.parse_args()
-
-# Get the resource if specified.
-if args.download_resource:
-    resources = obtain_resource(
-        resource_id=args.download_resource,
-        resource_directory=args.download_dir,
-    )
-
-    # This line seems pointless but is actually what triggers the download.
-    resources.get_local_path()
-
 
 # The GPU cache coherence protocols only work with the backing store
 args.access_backing_store = True
@@ -503,7 +428,6 @@ print(
 # shader is the GPU
 shader = Shader(
     n_wf=args.wfs_per_simd,
-    cu_per_sqc=args.cu_per_sqc,
     clk_domain=SrcClockDomain(
         clock=args.gpu_clock,
         voltage_domain=VoltageDomain(voltage=args.gpu_voltage),
@@ -558,8 +482,6 @@ for i in range(n_cu):
             mem_resp_latency=args.mem_resp_latency,
             scalar_mem_req_latency=args.scalar_mem_req_latency,
             scalar_mem_resp_latency=args.scalar_mem_resp_latency,
-            memtime_latency=args.memtime_latency,
-            mfma_scale=args.mfma_scale,
             localDataStore=LdsState(
                 banks=args.numLdsBanks,
                 bankConflictPenalty=args.ldsBankConflictPenalty,
@@ -571,7 +493,6 @@ for i in range(n_cu):
     vrfs = []
     vrf_pool_mgrs = []
     srfs = []
-    rfcs = []
     srf_pool_mgrs = []
     for j in range(args.simds_per_cu):
         for k in range(shader.n_wf):
@@ -616,16 +537,10 @@ for i in range(n_cu):
                 simd_id=j, wf_size=args.wf_size, num_regs=args.sreg_file_size
             )
         )
-        rfcs.append(
-            RegisterFileCache(
-                simd_id=j, cache_size=args.register_file_cache_size
-            )
-        )
 
     compute_units[-1].wavefronts = wavefronts
     compute_units[-1].vector_register_file = vrfs
     compute_units[-1].scalar_register_file = srfs
-    compute_units[-1].register_file_cache = rfcs
     compute_units[-1].register_manager = RegisterManager(
         policy=args.registerManagerPolicy,
         vrf_pool_managers=vrf_pool_mgrs,
@@ -756,7 +671,7 @@ render_driver = GPURenderDriver(filename=f"dri/renderD{renderDriNum}")
 gpu_hsapp = HSAPacketProcessor(
     pioAddr=hsapp_gpu_map_paddr, numHWQueues=args.num_hw_queues
 )
-dispatcher = GPUDispatcher(kernel_exit_events=True)
+dispatcher = GPUDispatcher()
 gpu_cmd_proc = GPUCommandProcessor(hsapp=gpu_hsapp, dispatcher=dispatcher)
 gpu_driver.device = gpu_cmd_proc
 shader.dispatcher = dispatcher
@@ -883,8 +798,6 @@ if fast_forward:
 # configure the TLB hierarchy
 GPUTLBConfig.config_tlb_hierarchy(args, system, shader_idx)
 
-system.exit_on_work_items = True
-
 # create Ruby system
 system.piobus = IOXBar(
     width=32, response_latency=0, frontend_latency=0, forward_latency=0
@@ -943,9 +856,9 @@ gpu_port_idx = gpu_port_idx - args.num_cp * 2
 token_port_idx = 0
 for i in range(len(system.ruby._cpu_ports)):
     if isinstance(system.ruby._cpu_ports[i], VIPERCoalescer):
-        system.cpu[shader_idx].CUs[token_port_idx].gmTokenPort = (
-            system.ruby._cpu_ports[i].gmTokenPort
-        )
+        system.cpu[shader_idx].CUs[
+            token_port_idx
+        ].gmTokenPort = system.ruby._cpu_ports[i].gmTokenPort
         token_port_idx += 1
 
 wavefront_size = args.wf_size
@@ -1025,15 +938,19 @@ root = Root(system=system, full_system=False)
 # knows what type of GPU hardware we are simulating
 if args.dgpu:
     assert args.gfx_version in [
+        "gfx803",
         "gfx900",
     ], "Incorrect gfx version for dGPU"
-    if args.gfx_version == "gfx900":
+    if args.gfx_version == "gfx803":
+        hsaTopology.createFijiTopology(args)
+    elif args.gfx_version == "gfx900":
         hsaTopology.createVegaTopology(args)
 else:
     assert args.gfx_version in [
+        "gfx801",
         "gfx902",
     ], "Incorrect gfx version for APU"
-    hsaTopology.createRavenTopology(args)
+    hsaTopology.createCarrizoTopology(args)
 
 m5.ticks.setGlobalFrequency("1THz")
 if args.abs_max_tick:
@@ -1058,41 +975,6 @@ if args.fast_forward:
     print("Switch at instruction count: %d" % cpu_list[0].max_insts_any_thread)
 
 exit_event = m5.simulate(maxtick)
-
-while True:
-    if (
-        exit_event.getCause() == "m5_exit instruction encountered"
-        or exit_event.getCause() == "user interrupt received"
-        or exit_event.getCause() == "simulate() limit reached"
-        or "exiting with last active thread context" in exit_event.getCause()
-    ):
-        print(f"breaking loop due to: {exit_event.getCause()}.")
-        break
-    elif "checkpoint" in exit_event.getCause():
-        assert args.checkpoint_dir is not None
-        m5.checkpoint(args.checkpoint_dir)
-        print("breaking loop with checkpoint")
-        break
-    elif "GPU Kernel Completed" in exit_event.getCause():
-        print("GPU Kernel Completed dump and reset")
-        m5.stats.dump()
-        m5.stats.reset()
-    elif "GPU Blit Kernel Completed" in exit_event.getCause():
-        print("GPU Blit Kernel Completed dump and reset")
-        m5.stats.dump()
-        m5.stats.reset()
-    elif "workbegin" in exit_event.getCause():
-        print("m5 work begin dump and reset")
-        m5.stats.dump()
-        m5.stats.reset()
-    elif "workend" in exit_event.getCause():
-        print("m5 work end dump and reset")
-        m5.stats.dump()
-        m5.stats.reset()
-    else:
-        print(f"Unknown exit event: {exit_event.getCause()}. Continuing...")
-
-    exit_event = m5.simulate(maxtick - m5.curTick())
 
 if args.fast_forward:
     if exit_event.getCause() == "a thread reached the max instruction count":

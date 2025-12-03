@@ -50,7 +50,7 @@ requires(isa_required=ISA.POWER)
 
 cache_hierarchy = NoCache()
 
-memory = SingleChannelDDR3_1600(size="32MiB")
+memory = SingleChannelDDR3_1600(size="32MB")
 processor = SimpleProcessor(
     cpu_type=CPUTypes.TIMING, isa=ISA.POWER, num_cores=2
 )
@@ -61,10 +61,8 @@ board = SimpleBoard(
     cache_hierarchy=cache_hierarchy,
 )
 board.set_se_binary_workload(
-    obtain_resource("power-hello", resource_version="1.0.0"),
-    checkpoint=obtain_resource(
-        "power-hello-test-checkpoint-v24-0", resource_version="2.0.0"
-    ),
+    obtain_resource("power-hello"),
+    checkpoint=obtain_resource("power-hello-test-checkpoint"),
 )
 
 sim = Simulator(board=board, full_system=False)

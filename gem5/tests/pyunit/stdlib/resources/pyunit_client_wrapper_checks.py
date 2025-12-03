@@ -31,18 +31,12 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 from urllib.error import HTTPError
-from urllib.parse import (
-    parse_qsl,
-    urlparse,
-)
 
-from gem5.resources.client import (
-    _create_clients,
-    get_resource_json_obj,
+from gem5.resources.client import get_resource_json_obj
+from gem5.resources.client_api.atlasclient import (
+    AtlasClientHttpJsonRequestError,
 )
-from gem5.resources.client_api.azure_functions_client import (
-    AzureFunctionsAPIClientHttpJsonRequestError,
-)
+from gem5.resources.client_api.client_wrapper import ClientWrapper
 
 mock_json_path = Path(__file__).parent / "refs/resources.json"
 mock_config_json = {
@@ -60,7 +54,9 @@ mock_config_mongo = {
             "dataSource": "gem5-vision",
             "database": "gem5-vision",
             "collection": "versions_test",
-            "url": "https://api.gem5.org/api/resources",
+            "url": "https://data.mongodb-api.com/app/data-ejhjf/endpoint/data/v1",
+            "authUrl": "https://realm.mongodb.com/api/client/v2.0/app/data-ejhjf/auth/providers/api-key/login",
+            "apiKey": "OIi5bAP7xxIGK782t8ZoiD2BkBGEzMdX3upChf9zdCxHSnMoiTnjI22Yw5kOSgy9",
             "isMongo": True,
         }
     },
@@ -80,7 +76,7 @@ with open(Path(__file__).parent / "refs/mongo-dup-mock.json") as f:
     duplicate_mock_json = json.load(f)
 
 
-def mocked_requests_post(*args, **kwargs):
+def mocked_requests_post(*args):
     # mokcing urllib.request.urlopen
     class MockResponse:
         def __init__(self, json_data, status_code):
@@ -90,49 +86,35 @@ def mocked_requests_post(*args, **kwargs):
         def read(self):
             return json.dumps(self.json_data).encode("utf-8")
 
-    url = args[0].full_url
-
-    # Parse the query string into a list of (key, value) pairs, then group every two consecutive pairs
-    # (e.g., ('id', '...'), ('resource_version', '...')) into a single dictionary for each resource
-    pairs = parse_qsl(urlparse(url).query)
-    data = [dict(pairs[i : i + 2]) for i in range(0, len(pairs), 2)]
-
+    data = json.loads(args[0].data)
     if "/api-key/login" in args[0].full_url:
         return MockResponse({"access_token": "test-token"}, 200)
-    if "/find-resources-in-batch" in args[0].full_url:
+    if "/endpoint/data/v1/action/find" in args[0].full_url:
         if data:
-            if data[0]["id"] == "x86-ubuntu-18.04-img":
-                if (
-                    "resource_version" in data[0]
-                    and data[0]["resource_version"] != "None"
-                ):
-                    resource_version = data[0]["resource_version"]
-                    ret_json = [
-                        resource
-                        for resource in mock_json
-                        if resource["resource_version"] == resource_version
-                    ]
-                    return MockResponse(
-                        ret_json,
-                        200,
-                    )
+            if data["filter"]["id"] == "x86-ubuntu-18.04-img":
                 return MockResponse(
-                    mock_json,
+                    {
+                        "documents": mock_json,
+                    },
                     200,
                 )
-            if data[0]["id"] == "test-duplicate":
+            if data["filter"]["id"] == "test-duplicate":
                 return MockResponse(
-                    duplicate_mock_json,
+                    {
+                        "documents": duplicate_mock_json,
+                    },
                     200,
                 )
-            if data[0]["id"] == "test-too-many":
+            if data["filter"]["id"] == "test-too-many":
                 error_file = io.BytesIO()
                 error_file.status = 429
                 raise HTTPError(
                     args[0].full_url, 429, "Too Many Requests", {}, error_file
                 )
         return MockResponse(
-            [],
+            {
+                "documents": [],
+            },
             200,
         )
     error_file = io.BytesIO()
@@ -143,13 +125,9 @@ def mocked_requests_post(*args, **kwargs):
 class ClientWrapperTestSuite(unittest.TestCase):
     @patch(
         "gem5.resources.client.clientwrapper",
-        new=None,
+        ClientWrapper(mock_config_json),
     )
-    @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_json),
-    )
-    def test_get_resource_json_obj(self, mock_create_clients):
+    def test_get_resource_json_obj(self):
         # Test that the resource object is correctly returned
         resource = "this-is-a-test-resource"
         resource = get_resource_json_obj(resource, gem5_version="develop")
@@ -167,13 +145,9 @@ class ClientWrapperTestSuite(unittest.TestCase):
 
     @patch(
         "gem5.resources.client.clientwrapper",
-        new=None,
+        ClientWrapper(mock_config_json),
     )
-    @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_json),
-    )
-    def test_get_resource_json_obj_invalid_client(self, mock_create_clients):
+    def test_get_resource_json_obj_invalid_client(self):
         # Test that an exception is raised when an invalid client is passed
         resource_id = "test-id"
         client = "invalid"
@@ -187,13 +161,9 @@ class ClientWrapperTestSuite(unittest.TestCase):
 
     @patch(
         "gem5.resources.client.clientwrapper",
-        new=None,
+        ClientWrapper(mock_config_json),
     )
-    @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_json),
-    )
-    def test_get_resource_json_obj_with_version(self, mock_create_clients):
+    def test_get_resource_json_obj_with_version(self):
         # Test that the resource object is correctly returned
         resource_id = "this-is-a-test-resource"
         resource_version = "1.0.0"
@@ -214,14 +184,10 @@ class ClientWrapperTestSuite(unittest.TestCase):
 
     @patch(
         "gem5.resources.client.clientwrapper",
-        new=None,
-    )
-    @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_mongo),
+        ClientWrapper(mock_config_mongo),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_get_resource_json_obj_1(self, mock_get, mock_create_clients):
+    def test_get_resource_json_obj_1(self, mock_get):
         resource = "x86-ubuntu-18.04-img"
         resource = get_resource_json_obj(resource, gem5_version="develop")
         self.assertEqual(resource["id"], "x86-ubuntu-18.04-img")
@@ -240,16 +206,10 @@ class ClientWrapperTestSuite(unittest.TestCase):
 
     @patch(
         "gem5.resources.client.clientwrapper",
-        new=None,
-    )
-    @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_mongo),
+        ClientWrapper(mock_config_mongo),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_get_resource_json_obj_with_version_mongodb(
-        self, mock_get, mock_create_clients
-    ):
+    def test_get_resource_json_obj_with_version_mongodb(self, mock_get):
         # Test that the resource object is correctly returned
         resource_id = "x86-ubuntu-18.04-img"
         resource_version = "1.0.0"
@@ -270,13 +230,11 @@ class ClientWrapperTestSuite(unittest.TestCase):
         self.assertEqual(resource["architecture"], "X86")
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_mongo),
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(mock_config_mongo),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_get_resource_json_obj_with_id_invalid_mongodb(
-        self, mock_get, mock_create_clients
-    ):
+    def test_get_resource_json_obj_with_id_invalid_mongodb(self, mock_get):
         resource_id = "invalid-id"
         with self.assertRaises(Exception) as context:
             get_resource_json_obj(
@@ -288,12 +246,12 @@ class ClientWrapperTestSuite(unittest.TestCase):
         )
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_mongo),
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(mock_config_mongo),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
     def test_get_resource_json_obj_with_version_invalid_mongodb(
-        self, mock_get, mock_create_clients
+        self, mock_get
     ):
         resource_id = "x86-ubuntu-18.04-img"
         resource_version = "2.5.0"
@@ -304,19 +262,18 @@ class ClientWrapperTestSuite(unittest.TestCase):
                 clients=["gem5-resources"],
                 gem5_version="develop",
             )
-        print(str(context.exception))
         self.assertTrue(
-            "Resource with ID 'x86-ubuntu-18.04-img' not found."
-            in str(context.exception)
+            f"Resource x86-ubuntu-18.04-img with version '2.5.0'"
+            " not found.\nResource versions can be found at: "
+            "https://resources.gem5.org/resources/x86-ubuntu-18.04-img/"
+            "versions" in str(context.exception)
         )
 
     @patch(
         "gem5.resources.client.clientwrapper",
-        side_effect=lambda x: _create_clients(mock_config_json),
+        ClientWrapper(mock_config_json),
     )
-    def test_get_resource_json_obj_with_version_invalid_json(
-        self, mock_create_clients
-    ):
+    def test_get_resource_json_obj_with_version_invalid_json(self):
         resource_id = "this-is-a-test-resource"
         resource_version = "2.5.0"
         with self.assertRaises(Exception) as context:
@@ -325,20 +282,19 @@ class ClientWrapperTestSuite(unittest.TestCase):
                 resource_version=resource_version,
                 gem5_version="develop",
             )
-        print(str(context.exception))
         self.assertTrue(
-            "source with ID 'this-is-a-test-resource' not found."
-            in str(context.exception)
+            "Resource this-is-a-test-resource with version '2.5.0'"
+            " not found.\nResource versions can be found at: "
+            "https://resources.gem5.org/resources/this-is-a-test-resource/"
+            "versions" in str(context.exception)
         )
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_combined),
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(mock_config_combined),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_get_resource_json_obj_combine(
-        self, mock_get, mock_create_clients
-    ):
+    def test_get_resource_json_obj_combine(self, mock_get):
         resource_id_mongo = "x86-ubuntu-18.04-img"
         resource_version_mongo = "1.0.0"
         resource_id_json = "this-is-a-test-resource"
@@ -381,17 +337,15 @@ class ClientWrapperTestSuite(unittest.TestCase):
         self.assertEqual(resource_json["architecture"], "X86")
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_combined),
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(mock_config_combined),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_get_resource_json_obj_multi_database_second_only(
-        self, mock_get, mock_create_clients
-    ):
+    def test_get_resource_json_obj_multi_database_second_only(self, mock_get):
         resource_id = "simpoint-resource"
         resource = get_resource_json_obj(
             resource_id,
-            gem5_version="DEVELOP",
+            gem5_version="develop",
         )
         self.assertEqual(resource["id"], resource_id)
         self.assertEqual(resource["resource_version"], "0.2.0")
@@ -406,12 +360,12 @@ class ClientWrapperTestSuite(unittest.TestCase):
         )
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_combined),
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(mock_config_combined),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
     def test_get_resource_json_same_resource_different_versions(
-        self, mock_get, mock_create_clients
+        self, mock_get
     ):
         resource_id = "x86-ubuntu-18.04-img"
         resource_json = get_resource_json_obj(
@@ -432,13 +386,11 @@ class ClientWrapperTestSuite(unittest.TestCase):
         self.assertEqual(resource_json["category"], "disk-image")
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_combined),
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(mock_config_combined),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_get_resource_same_resource_same_version(
-        self, mock_get, mock_create_clients
-    ):
+    def test_get_resource_same_resource_same_version(self, mock_get):
         resource_id = "test-duplicate"
         with self.assertRaises(Exception) as context:
             get_resource_json_obj(
@@ -451,8 +403,8 @@ class ClientWrapperTestSuite(unittest.TestCase):
         )
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(
             {
                 "sources": {
                     "gem5-resources": {
@@ -469,39 +421,35 @@ class ClientWrapperTestSuite(unittest.TestCase):
         ),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_invalid_auth_url(self, mock_get, mock_create_clients):
+    def test_invalid_auth_url(self, mock_get):
         resource_id = "test-resource"
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(AtlasClientHttpJsonRequestError) as context:
             get_resource_json_obj(
                 resource_id,
                 gem5_version="develop",
             )
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_mongo),
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(mock_config_mongo),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_invalid_url(self, mock_get, mock_create_clients):
+    def test_invalid_url(self, mock_get):
         resource_id = "test-resource"
-        with self.assertRaises(
-            AzureFunctionsAPIClientHttpJsonRequestError
-        ) as context:
+        with self.assertRaises(AtlasClientHttpJsonRequestError) as context:
             get_resource_json_obj(
                 resource_id,
                 gem5_version="develop",
             )
 
     @patch(
-        "gem5.resources.client._create_clients",
-        side_effect=lambda x: _create_clients(mock_config_mongo),
+        "gem5.resources.client.clientwrapper",
+        ClientWrapper(mock_config_mongo),
     )
     @patch("urllib.request.urlopen", side_effect=mocked_requests_post)
-    def test_invalid_url(self, mock_get, mock_create_clients):
+    def test_invalid_url(self, mock_get):
         resource_id = "test-too-many"
-        with self.assertRaises(
-            AzureFunctionsAPIClientHttpJsonRequestError
-        ) as context:
+        with self.assertRaises(AtlasClientHttpJsonRequestError) as context:
             get_resource_json_obj(
                 resource_id,
                 gem5_version="develop",

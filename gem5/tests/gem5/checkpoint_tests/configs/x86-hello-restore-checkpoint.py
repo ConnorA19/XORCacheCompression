@@ -50,9 +50,9 @@ from gem5.utils.requires import requires
 
 requires(isa_required=ISA.X86)
 
-cache_hierarchy = PrivateL1CacheHierarchy(l1d_size="16KiB", l1i_size="16KiB")
+cache_hierarchy = PrivateL1CacheHierarchy(l1d_size="16kB", l1i_size="16kB")
 
-memory = SingleChannelDDR3_1600(size="32MiB")
+memory = SingleChannelDDR3_1600(size="32MB")
 processor = SimpleProcessor(cpu_type=CPUTypes.TIMING, isa=ISA.X86, num_cores=4)
 board = SimpleBoard(
     clk_freq="3GHz",
@@ -61,13 +61,8 @@ board = SimpleBoard(
     cache_hierarchy=cache_hierarchy,
 )
 board.set_se_binary_workload(
-    obtain_resource(
-        "x86-hello64-static",
-        resource_version="1.0.0",
-    ),
-    checkpoint=obtain_resource(
-        "x86-hello-test-checkpoint-v24-0", resource_version="3.0.0"
-    ),
+    obtain_resource("x86-hello64-static"),
+    checkpoint=obtain_resource("x86-hello-test-checkpoint"),
 )
 
 sim = Simulator(board=board, full_system=False)
