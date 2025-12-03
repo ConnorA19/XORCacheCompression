@@ -1,5 +1,6 @@
 gem5/*
 Report/build/
+!gem5/Makefile
 !gem5/configs
 !gem5/tests
 !gem5/configs/**
