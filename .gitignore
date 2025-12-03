@@ -5,5 +5,5 @@ Report/build/
 !gem5/tests
 !gem5/configs/**
 !gem5/test/**
-!gem5/src/mem/cache/
+!gem5/src/mem/cache
 !gem5/src/mem/cache/**
