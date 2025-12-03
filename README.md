@@ -53,11 +53,11 @@ There are 4 benchmarks for testing the program. Each has a differently composed 
 To run all benchmarks:
 
   ```sh
-  ./developmentBenchark
+  ./developmentBenchmark
   ```
 
 To run specific benchmarks, include the number(s) (1-4) of the specific benchmark(s) you wish to test. The following text would run benchmarks 3 and 4:
 
  ```sh
-  ./developmentBenchark 3 4
+  ./developmentBenchmark 3 4
   ```
