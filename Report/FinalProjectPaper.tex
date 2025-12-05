@@ -9,6 +9,7 @@
 \usepackage{multirow}
 \usepackage{multicol}
 \usepackage{makecell}
+\usepackage{algpseudocode}
 
 \title{ XOR Cache Compression}
 \author{
@@ -39,6 +40,33 @@ Sections to include in paper:
     \item Results
     \item Conclusion/Discussion
 \end{enumerate}
+
+\section{Abstract}
+
+\section{Introduction}
+
+\section{Related Works}
+
+\section{The XOR Cache}
+
+\section{Implementation}
+
+\section{Benchmarks \& Testing Metrics}
+
+The PARSEC benchmark suite \cite{Parsec}, and its set of 12 programs, were used as benchmarks for testing the XOR cache. These benchmarks are used across scholarship \cite{Base-delta-immediate_compression, Last-level_cache_deduplication, 2DCC} for testing other schemes of cache compression. The benchmarks were chosen for our experiment in order to compare our algorithm design to other compression methods, as well as to use a real world multi-threaded benchmark in order to focus on building multi-threaded speedups.
+
+In addition to the PARSEC benchmarks, our XOR cache compression algorithm was run on a set of 4 small benchmark tests. These benchmarks were built for the purpose of easily viewing the functioning of the XOR cache and its compression output on a small, easily digestible scale. The pseudocode for each of these tests can be seen in Appendix A, but are briefly described below:
+
+\begin{enumerate}
+    \item find\textit{1}In\textit{N}Elements
+    \item count\textit{5}sIn\textit{N}Elements
+    \item count\textit{5}sInRandom\textit{N}Elements
+    \item count\textit{5}sInSparse\textit{N}Elements
+\end{enumerate}
+
+\section{Results}
+
+\section{Conclusion}
 
 \section{Project Description}
 At its core, computing is the transfer of information and as time goes on, the amount of data we collect, process, and store grows. This presents a key challenge of how to utilize the resources you have as efficiently as possible so that you consume less power. This problem compounds as we take a look at the world of computing and how a few speed-ups on some algorithms have saved billions of dollars in energy use worldwide. One method that helps our compute performance is compression. The goal of compression is to take a larger chunk of data and condense them to take up less space. More importantly, we can move this information faster when it takes up less space because it takes up less bandwidth. Today's processors have dedicated space on their die built for fast access SRAM for caching purposes. The CPU cache is one of its most powerful tools for quickly accessing local memory, much faster than typical RAM accesses. However, a processor's die can only fit so many components, making the placement of each unit compromise the compute efficiency in some way. Knowing this, cache compression has been an avenue through which we can squeeze more power out of processors while utilizing fewer resources. 
@@ -113,5 +141,96 @@ Our comparison against other algorithms will consist of timing the performance a
 
 \bibliographystyle{IEEEtran}
 \bibliography{reference}
+\section{Appendix}
+\subsection{Benchmark Pseudocode}
+\subsubsection{find\textit{1}In\textit{N}Elements}
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$, 
+\medskip
+\State $index = \text{rand()} \% n$
+\State $A[index] = 1$
+\medskip
+\State $retIndex = -1$
+
+\For{$i = 0$ to $n-1$}
+    \If{$A[i] == 1$}
+        \State $retIndex = i$
+    \EndIf
+\EndFor
+\medskip
+\State \Return $retIndex$
+
+\end{algorithmic}
+
+\medskip
+\subsubsection{count\textit{5}sIn\textit{N}Elements}
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$
+
+\For{$i = 0$ to $n-1$}
+    \State$A[i] = i\%10$
+    \EndFor
+    
+\State fiveCount = 0
+
+\For{item $x$ in $A$}
+    \If{$x=5$}
+        \State fiveCount+=1
+    \EndIf
+
+\EndFor
+
+\State \Return fiveCount
+
+\end{algorithmic}
+
+\medskip
+\subsubsection{count\textit{5}sInRandom\textit{N}Elements}
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$, 
+\medskip
+\For{$i = 0$ to $n-1$}
+    \State A[i] = $(\text{rand()}+1) \bmod 100$
+    \EndFor
+\medskip
+\State fiveCount = 0
+\For{$i = 0$ to $n-1$}
+    \If{$A[i]==5$}
+        \State fiveCount+=1
+    \EndIf
+    \EndFor
+\medskip
+\State \Return fiveCount
+
+\end{algorithmic}
+
+\medskip
+\subsubsection{count\textit{5}sInSparse\textit{N}Elements}
+
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$
+
+\For{$i = 0$ to $n-1$}
+    \If{$i\%10==5$}
+        \State $A[i]=i\%10$
+    \EndIf
+    \EndFor
+    
+\State fiveCount = 0
+
+\For{item $x$ in $A$}
+    \If{$x=5$}
+        \State fiveCount+=1
+    \EndIf
+
+\EndFor
+
+\State \Return fiveCount
+
+\end{algorithmic}
 
 \end{document}
