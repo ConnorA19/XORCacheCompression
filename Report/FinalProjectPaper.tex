@@ -46,34 +46,6 @@ Sections to include in paper:
 \section{Introduction}
 
 \section{Related Works}
-
-\section{The XOR Cache}
-
-\section{Implementation}
-
-\section{Benchmarks \& Testing Metrics}
-
-The PARSEC benchmark suite \cite{Parsec}, and its set of 12 programs, were used as benchmarks for testing the XOR cache. These benchmarks are used across scholarship \cite{Base-delta-immediate_compression, Last-level_cache_deduplication, 2DCC} for testing other schemes of cache compression. The benchmarks were chosen for our experiment in order to compare our algorithm design to other compression methods, as well as to use a real world multi-threaded benchmark in order to focus on building multi-threaded speedups.
-
-In addition to the PARSEC benchmarks, our XOR cache compression algorithm was run on a set of 4 small benchmark tests. These benchmarks were built for the purpose of easily viewing the functioning of the XOR cache and its compression output on a small, easily digestible scale. The pseudocode for each of these tests can be seen in Appendix A, but are briefly described below:
-
-\begin{enumerate}
-    \item find\textit{1}In\textit{N}Elements
-    \item count\textit{5}sIn\textit{N}Elements
-    \item count\textit{5}sInRandom\textit{N}Elements
-    \item count\textit{5}sInSparse\textit{N}Elements
-\end{enumerate}
-
-\section{Results}
-
-\section{Conclusion}
-
-\section{Project Description}
-At its core, computing is the transfer of information and as time goes on, the amount of data we collect, process, and store grows. This presents a key challenge of how to utilize the resources you have as efficiently as possible so that you consume less power. This problem compounds as we take a look at the world of computing and how a few speed-ups on some algorithms have saved billions of dollars in energy use worldwide. One method that helps our compute performance is compression. The goal of compression is to take a larger chunk of data and condense them to take up less space. More importantly, we can move this information faster when it takes up less space because it takes up less bandwidth. Today's processors have dedicated space on their die built for fast access SRAM for caching purposes. The CPU cache is one of its most powerful tools for quickly accessing local memory, much faster than typical RAM accesses. However, a processor's die can only fit so many components, making the placement of each unit compromise the compute efficiency in some way. Knowing this, cache compression has been an avenue through which we can squeeze more power out of processors while utilizing fewer resources. 
-
-The goal of our project is to increase compute efficiency by utilizing compression techniques on a processors cache. Our plan is to utilize different types of compression techniques from the available literature on the topic and to analyze the results and see what steps can be taken to improve further. Some important metrics that we will be measuring include cache hits/misses, the cycles-per-instruction, and check if the data matches after decompression.
-
-\section{Literature Review}
 Cache compression is a prolific branch of research in the pursuit of improving cache performance. Cache compression allows for the benefits that come with increasing cache size without any of the latency or other challenges that arise from large cache size \cite{Understanding_Cache_Compression}. This method works by compressing lines upon insertion and decompressing them upon access. While the higher level idea behind cache compression is the same, methods of cache compression defer by their chosen cache compaction scheme. This scheme defines the decisions made by the technique that explain why, when, how, and where compression is being applied and the data is placed after compression \cite{Understanding_Cache_Compression}. 
 
 There are a number of factors that go into a method's cache compaction scheme. These factors define the ways in which cache compression methods address the handling of data and mapping of compressed data. Some factors include expansion, mapping, and tag optimization. Carvalho and Seznec \cite{Understanding_Cache_Compression} describe these concepts as follows: 
@@ -101,6 +73,36 @@ However,  neither intra-line nor inter-line compression alone can fully address 
 
 \subsection{Taking advantage of both}
 As redundancy can occur within and across cache lines, recent research has explored hybrid compression mechanisms that exploit both granularities to further advance the cache capacity. Dictionary Sharing \cite{Dictionary_sharing} improves inter-line compaction by extracting distinct 4-byte chunks from neighboring blocks and storing them in a shared dictionary by exploiting both content locality and upper-bit similarity. Both 2DCC \cite{2DCC} and Thesaurus \cite{Thesaurus} simultaneously exploits inter-line deduplication and intra-line compression using a hashing and locality-sensitive hashing (LSH) accordingly, where duplicates or similar clusters are replaced with references and then unique blocks are compressed. Unlike prior designs, XOR Cache \cite{The_XOR_Cache} extends hybrid compression by storing the bitwise XOR of similar line pairs, layered on top of traditional intra-line techniques. This reduces the storage demand by half with minimal performance loss.
+
+\section{The XOR Cache}
+
+\section{Implementation}
+
+\section{Benchmarks \& Testing Metrics}
+
+The PARSEC benchmark suite \cite{Parsec}, and its set of 12 programs, were used as benchmarks for testing the XOR cache. These benchmarks are used across scholarship \cite{Base-delta-immediate_compression, Last-level_cache_deduplication, 2DCC} for testing other schemes of cache compression. The benchmarks were chosen for our experiment in order to compare our algorithm design to other compression methods, as well as to use a real world multi-threaded benchmark in order to focus on building multi-threaded speedups.
+
+In addition to the PARSEC benchmarks, our XOR cache compression algorithm was run on a set of 4 small benchmark tests. These benchmarks were built for the purpose of easily viewing the functioning of the XOR cache and its compression output on a small, easily digestible scale. The pseudocode for each of these tests can be seen in Appendix A, but are briefly described below:
+
+\begin{enumerate}
+    \item find\textit{1}In\textit{N}Elements: Fill an array with all 0s, except one random single value. Then tasked with scanning array to find non-zero value.
+    \item count\textit{5}sIn\textit{N}Elements: Fill an array with sequentially increasing values. Then tasked with counting the number of 5s in the array.
+    \item count\textit{5}sInRandom\textit{N}Elements: Fill an array with random values (non-sequential). Then tasked with counting the number of 5s in the array.
+    \item count\textit{5}sInSparse\textit{N}Elements: Fill an array with an item every next 5th item in the array. Then tasked with counting the number of 5s in the array.
+\end{enumerate}
+
+These simple tests were chosen to see how well our XOR cache compression algorithm is able to compress repetitive and reoccurring data, as well as whether or not it is able to decompress the data accurately. An accurate decompression would lead to correct results for each of the benchmarks' tasks, such as counting the number of 5s in the array.
+
+The metrics being collected for each test are instructions per cycle (IPC), cycles per instructions (CPI), and the rate of successful compressions. These metrics were chosen in order to determine not just whether or not our XOR cache is functioning, but also whether or not the usage of the compression scheme improves overall cache performance.
+
+\section{Results}
+
+\section{Conclusion}
+
+\section{Project Description}
+At its core, computing is the transfer of information and as time goes on, the amount of data we collect, process, and store grows. This presents a key challenge of how to utilize the resources you have as efficiently as possible so that you consume less power. This problem compounds as we take a look at the world of computing and how a few speed-ups on some algorithms have saved billions of dollars in energy use worldwide. One method that helps our compute performance is compression. The goal of compression is to take a larger chunk of data and condense them to take up less space. More importantly, we can move this information faster when it takes up less space because it takes up less bandwidth. Today's processors have dedicated space on their die built for fast access SRAM for caching purposes. The CPU cache is one of its most powerful tools for quickly accessing local memory, much faster than typical RAM accesses. However, a processor's die can only fit so many components, making the placement of each unit compromise the compute efficiency in some way. Knowing this, cache compression has been an avenue through which we can squeeze more power out of processors while utilizing fewer resources. 
+
+The goal of our project is to increase compute efficiency by utilizing compression techniques on a processors cache. Our plan is to utilize different types of compression techniques from the available literature on the topic and to analyze the results and see what steps can be taken to improve further. Some important metrics that we will be measuring include cache hits/misses, the cycles-per-instruction, and check if the data matches after decompression.
 
 \section{Work Plan}
 \subsection{Overview}
