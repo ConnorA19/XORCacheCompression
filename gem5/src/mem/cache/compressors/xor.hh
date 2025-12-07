@@ -40,6 +40,7 @@ class Xor : public Base
 class Xor::XorCompressionData : public CompressionData
 {
     public:
+        std::vector<std::uint8_t> mask;
         std::vector<Chunk> xorChunks;
 
         XorCompressionData(unsigned num_chunks)
