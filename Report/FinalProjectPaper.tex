@@ -10,6 +10,26 @@
 \usepackage{multicol}
 \usepackage{makecell}
 \usepackage{algpseudocode}
+\usepackage[most]{tcolorbox}
+\usepackage{algorithm}
+
+
+\tcbset{
+  myalgo/.style={
+    enhanced,
+    colback=white,
+    colframe=black,
+    width=\columnwidth,
+    boxrule=0.5pt,
+    arc=2pt,
+    left=2pt,
+    right=2pt,
+    top=2pt,
+    bottom=2pt,
+    before skip=0pt, 
+    after skip=12pt,
+  }
+}
 
 \title{ XOR Cache Compression}
 \author{
@@ -32,11 +52,11 @@ Email: \{aliji001, anton386, crave112, srist001\}@umn.edu}
 Sections to include in paper:
 \begin{enumerate}
     \item Abstract
-    \item Introduction
-    \item Related Works
-    \item XOR Cache (High Level Overview of Architecture)
+    \item Introduction \checkmark
+    \item Related Works \checkmark 
+    \item XOR Cache (High Level Overview of Architecture) \checkmark 
     \item Implementation of XOR Cache (how we went about actually implementing it)
-    \item Benchmarks and Metrics for Testing
+    \item Benchmarks and Metrics for Testing \checkmark 
     \item Results
     \item Conclusion/Discussion
 \end{enumerate}
@@ -44,6 +64,11 @@ Sections to include in paper:
 \section{Abstract}
 
 \section{Introduction}
+At its core, computing is the transfer of information and as time goes on, the amount of data we collect, process, and store grows. This presents a key challenge of how to utilize the resources you have as efficiently as possible so that you consume less power. This problem compounds as we take a look at the world of computing and how a few speed-ups on some algorithms have saved billions of dollars in energy use worldwide. One method that helps our compute performance is compression. The goal of compression is to take a larger chunk of data and condense them to take up less space. More importantly, we can move this information faster when it takes up less space because it takes up less bandwidth. Today's processors have dedicated space on their die built for fast access SRAM for caching purposes. The CPU cache is one of its most powerful tools for quickly accessing local memory, much faster than typical RAM accesses. However, a processor's die can only fit so many components, making the placement of each unit compromise the compute efficiency in some way. Knowing this, cache compression has been an avenue through which we can squeeze more power out of processors while utilizing fewer resources. 
+
+There is a vast amount of scholarship on cache compression schemes\cite{2DCC,Base-delta-immediate_compression,Base-victim_compression,BCD_deduplication,Bunker_Cache,Dictionary_sharing,Doppelganger,Ecco,Exploiting_Inter-block_Entropy,Frequent_Pattern_Compression,HyComp,Last-level_cache_deduplication,MORC,SC2,Thesaurus,Touche}. One such method of cache compression is the Xor Cache. \cite{The_XOR_Cache}. The XOR cache leverages redundancy across cache lines. When a line of data that already exits in the cache tries to be stored, this compression scheme will instead XOR this line with the existing line at a lower level in the cache. On access, another XOR operation is performed on the same line in order to decompress it.
+
+The XOR Cache is a design that not only has the benefits of saving storage and reducing entropy, but it is also quite simple to understand. It is for these reasons that we chose to do a replicative study on the XOR Cache as a method of cache compression. In our investigation, we implement the XOR cache structure and test its ability to compress data effectively on a number of benchmarks.
 
 \section{Related Works}
 Cache compression is a prolific branch of research in the pursuit of improving cache performance. Cache compression allows for the benefits that come with increasing cache size without any of the latency or other challenges that arise from large cache size \cite{Understanding_Cache_Compression}. This method works by compressing lines upon insertion and decompressing them upon access. While the higher level idea behind cache compression is the same, methods of cache compression defer by their chosen cache compaction scheme. This scheme defines the decisions made by the technique that explain why, when, how, and where compression is being applied and the data is placed after compression \cite{Understanding_Cache_Compression}. 
@@ -75,8 +100,87 @@ However,  neither intra-line nor inter-line compression alone can fully address 
 As redundancy can occur within and across cache lines, recent research has explored hybrid compression mechanisms that exploit both granularities to further advance the cache capacity. Dictionary Sharing \cite{Dictionary_sharing} improves inter-line compaction by extracting distinct 4-byte chunks from neighboring blocks and storing them in a shared dictionary by exploiting both content locality and upper-bit similarity. Both 2DCC \cite{2DCC} and Thesaurus \cite{Thesaurus} simultaneously exploits inter-line deduplication and intra-line compression using a hashing and locality-sensitive hashing (LSH) accordingly, where duplicates or similar clusters are replaced with references and then unique blocks are compressed. Unlike prior designs, XOR Cache \cite{The_XOR_Cache} extends hybrid compression by storing the bitwise XOR of similar line pairs, layered on top of traditional intra-line techniques. This reduces the storage demand by half with minimal performance loss.
 
 \section{The XOR Cache}
+The XOR Cache \cite{The_XOR_Cache} is a very recently proposed last-level cache (LLC) architecture. Rather than storing duplicate copies of same cache line in different layer of memory, XOR cache store the XORed result of two cache line. Its core idea is that, the same line that appear in L1, L2, and the LLC is wasted space. For example, if line A is already in every core’s private cache, the LLC still stores another full copy of A, even though the system doesn’t really need it. This duplication is considered overhead. Instead instead of storing A and B separately in the LLC, XOR Cache stores just $A\oplus B$.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\linewidth]{XOR_VS_Traditional.png}
+    \caption{Traditional versus XOR-based cache line storage.}
+    \label{fig:XOR_VS_Traditional}
+\end{figure}
+
+Here’s the intuition as it is also shown in the figure \ref{fig:XOR_VS_Traditional}:
+
+Suppose $A = 11110000$ already exists in an L1 cache. And the LLC wants to store $B = 11110011$.
+
+The XOR Cache stores only the XOR:
+$$A\oplus B=00000011$$
+
+Since one copy of A would definitely exist in some L1/L2 cache , the system can always reconstruct B when needed:
+$$ B=(A \oplus B) \oplus A $$
+
+So instead of considering all those private-cache copies of A as waste, XOR Cache treats them as free information that lets it compress two lines into one LLC slot.
+
+By pairing up similar cache lines and storing only their XOR, the design performs inter-line compression. And since XORing similar lines reduces their randomness, the resulting data becomes easier for traditional intra-line compression schemes like BDI\cite{Base-delta-immediate_compression} or BVC\cite{Base-victim_compression} to shrink even further. Eventually, this produces a much more compact and power-efficient LLC that performs nearly as fast as a regular one, while storing two cache lines in the space of one whenever XOR compression is applied.
 
 \section{Implementation}
+
+\subsection{Simulator Configuration}
+
+The gem5 simulator (version ~23.1) set up in syscall-emulation (SE) mode for the X86 ISA is used to evaluate the XOR-based compression mechanism. The simulated platform operates in timing mode with a single \texttt{X86TimingSimpleCPU} clocked at 2 GHz. Main memory functions as a DDR3-1600 device connected via a system crossbar interconnect to a 256 MIB physical address space.
+
+\subsection{System Configuration}
+
+The system uses gem5's classic cache hierarchy with private L1 instruction and
+data caches, optional private L2 caches, and a shared last-level cache (LLC).
+Unless otherwise specified, all cache parameters like capacity,
+associativity, latency, and replacement policy, remain at gem5's default values.
+The cache-line size is fixed at 64\,B across the hierarchy. this default setup ensures that all observed effect results solely from the compression
+mechanism.
+
+Compression support is enabled selectively using gem5's
+\texttt{CompressedTags} interface. Several compressor options are tested at
+runtime, including a baseline uncompressed configuration, a zero-value
+compressor, an FPC-style compressor, and the proposed XOR-based compressor. When
+compression is enabled, a maximum compression ratio of 2:1 is enforced. Unless
+explicitly stated, only the LLC applies compression, while upper-level caches
+remain uncompressed to preserve the XOR Cache assumption that duplicate copies
+reside in private caches.
+
+\subsection{XOR Compressor Design}
+
+The XOR compressor is implemented as an extension of gem5’s modular compression
+framework. It inherits all the properties from the \texttt{compression::Base} class and overrides only
+the \texttt{compress()} and \texttt{decompress()} mechanisms to apply a
+lightweight, reversible XOR transform to each cache line. Internally, each line
+is represented as a vector of fixed-size \texttt{Chunk} units.
+
+During compression, the first chunk of the line is stored verbatim, while each
+subsequent chunk is XORed with its immediate predecessor:
+\[
+    C_0 = X_0,\qquad
+    C_i = X_i \oplus X_{i-1},\quad i \ge 1,
+\]
+where $X_i$ and $C_i$ denote the original and encoded chunks, respectively. This
+prefix-XOR transform reduces intra-line entropy and increases compatibility with
+conventional pattern-based compressors such as BDI or BVC. Compression latency
+is modeled according to the number of chunks processed per cycle, consistent
+with gem5’s existing compressor timing model.
+
+Decompression applies the inverse transformation:
+\[
+    X_0 = C_0,\qquad
+    X_i = C_i \oplus X_{i-1},\quad i \ge 1,
+\]
+reconstructing the original chunk sequence before it is written back into the
+cache line. The decompression
+latency used here is the same as the compression latency.
+
+\subsection{Integration with the Cache Hierarchy}
+
+The XOR compressor can be applied to any cache structure that supports compressed tags and integrates easily with gem5's compression framework. To evaluate its effect on capacity utilization, efficient line storage, and overall memory-system performance, the LLC is set up to use the XOR compressor in the evaluation setup. In order to ensure that variances in observed behavior are solely caused by the application of XOR-based compression at the LLC, all other cache levels maintain uncompressed tag stores.
+
+
 
 \section{Benchmarks \& Testing Metrics}
 
@@ -100,27 +204,25 @@ The metrics being collected for each test are instructions per cycle (IPC), cycl
 \section{Conclusion}
 
 \section{Project Description}
-At its core, computing is the transfer of information and as time goes on, the amount of data we collect, process, and store grows. This presents a key challenge of how to utilize the resources you have as efficiently as possible so that you consume less power. This problem compounds as we take a look at the world of computing and how a few speed-ups on some algorithms have saved billions of dollars in energy use worldwide. One method that helps our compute performance is compression. The goal of compression is to take a larger chunk of data and condense them to take up less space. More importantly, we can move this information faster when it takes up less space because it takes up less bandwidth. Today's processors have dedicated space on their die built for fast access SRAM for caching purposes. The CPU cache is one of its most powerful tools for quickly accessing local memory, much faster than typical RAM accesses. However, a processor's die can only fit so many components, making the placement of each unit compromise the compute efficiency in some way. Knowing this, cache compression has been an avenue through which we can squeeze more power out of processors while utilizing fewer resources. 
 
-The goal of our project is to increase compute efficiency by utilizing compression techniques on a processors cache. Our plan is to utilize different types of compression techniques from the available literature on the topic and to analyze the results and see what steps can be taken to improve further. Some important metrics that we will be measuring include cache hits/misses, the cycles-per-instruction, and check if the data matches after decompression.
 
-\section{Work Plan}
-\subsection{Overview}
-\begin{enumerate}
-    \item \textbf{Algorithm Design:} We will begin by designing a cache compression algorithm that we believe can give significant efficiency or performance enhancements on a set of workloads.
-    \item \textbf{Algorithm Implementation:} We will implement our algorithm into a simulator (most likely gem5) and generate a way to implement our cache with our workload for testing
-    \item \textbf{Testing:} Implementing our algorithm into the simulator, we will produce efficiency (hit rate) and performance (CPU time) results.
-    \item \textbf{Recording:} We will record and document our findings while creating easy to read graphs and tables to convey our quantitative findings.
-\end{enumerate}
-\subsection{Work load}
-\subsubsection{Development}
-We can develop a very simple benchmark (such as multiplying an $n \times n$ matrix) to work on our development and fine tuning of the algorithm to get speedups we desire.
-\subsubsection{Standard}
-We will focus primarily on the PARSEC benchmark suite \cite{Parsec}.  This will allow us to have a way to compare our compression algorithms to many others, as through our literature review we found that many algorithms use the parsec benchmark.  The parsec benchmark will allow us to have a real world multi-threaded benchmark so we can focus on building multi-threaded speedups.  As more computers adapt more cores and threads, the parsec benchmark will allow us to view a relevant benchmark.
-\subsubsection{Real World}
-While standard benchmarks are important, many efficiency increases only matter if they are applicable to the real world.  We can use gcc as a bench mark if we use gem5 and input a program to be compiled using our cache algorithm with "gcc" and "gcc -jn" to check the speedups per thread count. This will only be done if we believe that our benchmark is not satisfactory in gathering all the information we need, or if we have the extra time to develop it.
-\subsection{Comparison}
-Our comparison against other algorithms will consist of timing the performance and tracking the efficiency of the algorithm against the standard benchmark.  Using this data, we will utilize python to create visualizations to compare our results with.
+% \section{Work Plan}
+% \subsection{Overview}
+% \begin{enumerate}
+%     \item \textbf{Algorithm Design:} We will begin by designing a cache compression algorithm that we believe can give significant efficiency or performance enhancements on a set of workloads.
+%     \item \textbf{Algorithm Implementation:} We will implement our algorithm into a simulator (most likely gem5) and generate a way to implement our cache with our workload for testing
+%     \item \textbf{Testing:} Implementing our algorithm into the simulator, we will produce efficiency (hit rate) and performance (CPU time) results.
+%     \item \textbf{Recording:} We will record and document our findings while creating easy to read graphs and tables to convey our quantitative findings.
+% \end{enumerate}
+% \subsection{Work load}
+% \subsubsection{Development}
+% We can develop a very simple benchmark (such as multiplying an $n \times n$ matrix) to work on our development and fine tuning of the algorithm to get speedups we desire.
+% \subsubsection{Standard}
+% We will focus primarily on the PARSEC benchmark suite \cite{Parsec}.  This will allow us to have a way to compare our compression algorithms to many others, as through our literature review we found that many algorithms use the parsec benchmark.  The parsec benchmark will allow us to have a real world multi-threaded benchmark so we can focus on building multi-threaded speedups.  As more computers adapt more cores and threads, the parsec benchmark will allow us to view a relevant benchmark.
+% \subsubsection{Real World}
+% While standard benchmarks are important, many efficiency increases only matter if they are applicable to the real world.  We can use gcc as a bench mark if we use gem5 and input a program to be compiled using our cache algorithm with "gcc" and "gcc -jn" to check the speedups per thread count. This will only be done if we believe that our benchmark is not satisfactory in gathering all the information we need, or if we have the extra time to develop it.
+% \subsection{Comparison}
+% Our comparison against other algorithms will consist of timing the performance and tracking the efficiency of the algorithm against the standard benchmark.  Using this data, we will utilize python to create visualizations to compare our results with.
 
 % \textbf{XOR Paper Notes 2025 \cite{The_XOR_Cache}}\\
 
@@ -143,16 +245,18 @@ Our comparison against other algorithms will consist of timing the performance a
 
 \bibliographystyle{IEEEtran}
 \bibliography{reference}
+
 \section{Appendix}
+
 \subsection{Benchmark Pseudocode}
-\subsubsection{find\textit{1}In\textit{N}Elements}
+
+\noindent\textbf{1) find\textit{1}In\textit{N}Elements}
+\begin{tcolorbox}[myalgo]
 \begin{algorithmic}
 
-\State Allocate array $A$ of size $n$, 
-\medskip
+\State Allocate array $A$ of size $n$
 \State $index = \text{rand()} \% n$
 \State $A[index] = 1$
-\medskip
 \State $retIndex = -1$
 
 \For{$i = 0$ to $n-1$}
@@ -160,79 +264,89 @@ Our comparison against other algorithms will consist of timing the performance a
         \State $retIndex = i$
     \EndIf
 \EndFor
-\medskip
+
 \State \Return $retIndex$
 
 \end{algorithmic}
+\end{tcolorbox}
 
-\medskip
-\subsubsection{count\textit{5}sIn\textit{N}Elements}
+
+
+\noindent\textbf{2) count\textit{5}sIn\textit{N}Elements}
+\begin{tcolorbox}[myalgo]
 \begin{algorithmic}
 
 \State Allocate array $A$ of size $n$
 
 \For{$i = 0$ to $n-1$}
-    \State$A[i] = i\%10$
-    \EndFor
-    
+    \State $A[i] = i \% 10$
+\EndFor
+
 \State fiveCount = 0
 
 \For{item $x$ in $A$}
-    \If{$x=5$}
-        \State fiveCount+=1
+    \If{$x == 5$}
+        \State fiveCount += 1
     \EndIf
-
 \EndFor
 
 \State \Return fiveCount
 
 \end{algorithmic}
+\end{tcolorbox}
 
-\medskip
-\subsubsection{count\textit{5}sInRandom\textit{N}Elements}
-\begin{algorithmic}
 
-\State Allocate array $A$ of size $n$, 
-\medskip
-\For{$i = 0$ to $n-1$}
-    \State A[i] = $(\text{rand()}+1) \bmod 100$
-    \EndFor
-\medskip
-\State fiveCount = 0
-\For{$i = 0$ to $n-1$}
-    \If{$A[i]==5$}
-        \State fiveCount+=1
-    \EndIf
-    \EndFor
-\medskip
-\State \Return fiveCount
 
-\end{algorithmic}
-
-\medskip
-\subsubsection{count\textit{5}sInSparse\textit{N}Elements}
-
+\noindent\textbf{3) count\textit{5}sInRandom\textit{N}Elements}
+\begin{tcolorbox}[myalgo]
 \begin{algorithmic}
 
 \State Allocate array $A$ of size $n$
 
 \For{$i = 0$ to $n-1$}
-    \If{$i\%10==5$}
-        \State $A[i]=i\%10$
-    \EndIf
-    \EndFor
-    
+    \State $A[i] = (\text{rand()} + 1) \bmod 100$
+\EndFor
+
 \State fiveCount = 0
 
-\For{item $x$ in $A$}
-    \If{$x=5$}
-        \State fiveCount+=1
+\For{$i = 0$ to $n-1$}
+    \If{$A[i] == 5$}
+        \State fiveCount += 1
     \EndIf
-
 \EndFor
 
 \State \Return fiveCount
 
 \end{algorithmic}
+\end{tcolorbox}
+
+
+
+\noindent\textbf{4) count\textit{5}sInSparse\textit{N}Elements}
+\begin{tcolorbox}[myalgo]
+\begin{algorithmic}
+
+\State Allocate array $A$ of size $n$
+
+\For{$i = 0$ to $n-1$}
+    \If{$i \% 10 == 5$}
+        \State $A[i] = i \% 10$
+    \EndIf
+\EndFor
+
+\State fiveCount = 0
+
+\For{item $x$ in $A$}
+    \If{$x == 5$}
+        \State fiveCount += 1
+    \EndIf
+\EndFor
+
+\State \Return fiveCount
+
+\end{algorithmic}
+\end{tcolorbox}
+
+
 
 \end{document}
