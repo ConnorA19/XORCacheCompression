@@ -55,7 +55,7 @@ Sections to include in paper:
     \item Introduction \checkmark
     \item Related Works \checkmark 
     \item XOR Cache (High Level Overview of Architecture) \checkmark 
-    \item Implementation of XOR Cache (how we went about actually implementing it)
+    \item Implementation of XOR Cache (how we went about actually implementing it) \checkmark
     \item Benchmarks and Metrics for Testing \checkmark 
     \item Results
     \item Conclusion/Discussion
@@ -135,7 +135,7 @@ The system uses gem5's classic cache hierarchy with private L1 instruction and
 data caches, optional private L2 caches, and a shared last-level cache (LLC).
 Unless otherwise specified, all cache parameters like capacity,
 associativity, latency, and replacement policy, remain at gem5's default values.
-The cache-line size is fixed at 64\,B across the hierarchy. this default setup ensures that all observed effect results solely from the compression
+The cache-line size is fixed at 64\,B across the hierarchy. This default setup ensures that all observed affects on the results come solely from the compression
 mechanism.
 
 Compression support is enabled selectively using gem5's
@@ -163,7 +163,7 @@ subsequent chunk is XORed with its immediate predecessor:
 \]
 where $X_i$ and $C_i$ denote the original and encoded chunks, respectively. This
 prefix-XOR transform reduces intra-line entropy and increases compatibility with
-conventional pattern-based compressors such as BDI or BVC. Compression latency
+conventional pattern-based compressors such as BDI\cite{Base-delta-immediate_compression} or BVC\cite{Base-victim_compression}. Compression latency
 is modeled according to the number of chunks processed per cycle, consistent
 with gem5’s existing compressor timing model.
 
