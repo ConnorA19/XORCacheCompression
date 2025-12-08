@@ -1,4 +1,0 @@
-dummy.lo: \
- /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/vips/src/libvips/dummy.c \
- /usr/include/stdc-predef.h
-/usr/include/stdc-predef.h:

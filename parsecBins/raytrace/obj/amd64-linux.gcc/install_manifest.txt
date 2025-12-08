@@ -1,4 +1,0 @@
-/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/inst/amd64-linux.gcc/bin/test_glut
-/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/inst/amd64-linux.gcc/lib/libRTTL.a
-/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/inst/amd64-linux.gcc/lib/libLRT.a
-/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/inst/amd64-linux.gcc/bin/rtview
