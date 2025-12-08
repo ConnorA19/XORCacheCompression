@@ -12,6 +12,7 @@
 \usepackage{algpseudocode}
 \usepackage[most]{tcolorbox}
 \usepackage{algorithm}
+\usepackage{hyperref}
 
 
 \tcbset{
@@ -58,7 +59,8 @@ Sections to include in paper:
     \item Implementation of XOR Cache (how we went about actually implementing it) \checkmark
     \item Benchmarks and Metrics for Testing \checkmark 
     \item Results
-    \item Conclusion/Discussion
+    \item Discussion : mention challenges, as well as analysis of results
+    \item Conclusion
 \end{enumerate}
 
 \section{Abstract}
@@ -180,7 +182,9 @@ latency used here is the same as the compression latency.
 
 The XOR compressor can be applied to any cache structure that supports compressed tags and integrates easily with gem5's compression framework. To evaluate its effect on capacity utilization, efficient line storage, and overall memory-system performance, the LLC is set up to use the XOR compressor in the evaluation setup. In order to ensure that variances in observed behavior are solely caused by the application of XOR-based compression at the LLC, all other cache levels maintain uncompressed tag stores.
 
+The code for the program, benchmarks, and results can be viewed here: 
 
+\href{https://github.com/ConnorA19/XORCacheCompression.git.}{https://github.com/ConnorA19/XORCacheCompression.git.}
 
 \section{Benchmarks \& Testing Metrics}
 
@@ -201,46 +205,10 @@ The metrics being collected for each test are instructions per cycle (IPC), cycl
 
 \section{Results}
 
+\section{Discussion}
+
 \section{Conclusion}
 
-\section{Project Description}
-
-
-% \section{Work Plan}
-% \subsection{Overview}
-% \begin{enumerate}
-%     \item \textbf{Algorithm Design:} We will begin by designing a cache compression algorithm that we believe can give significant efficiency or performance enhancements on a set of workloads.
-%     \item \textbf{Algorithm Implementation:} We will implement our algorithm into a simulator (most likely gem5) and generate a way to implement our cache with our workload for testing
-%     \item \textbf{Testing:} Implementing our algorithm into the simulator, we will produce efficiency (hit rate) and performance (CPU time) results.
-%     \item \textbf{Recording:} We will record and document our findings while creating easy to read graphs and tables to convey our quantitative findings.
-% \end{enumerate}
-% \subsection{Work load}
-% \subsubsection{Development}
-% We can develop a very simple benchmark (such as multiplying an $n \times n$ matrix) to work on our development and fine tuning of the algorithm to get speedups we desire.
-% \subsubsection{Standard}
-% We will focus primarily on the PARSEC benchmark suite \cite{Parsec}.  This will allow us to have a way to compare our compression algorithms to many others, as through our literature review we found that many algorithms use the parsec benchmark.  The parsec benchmark will allow us to have a real world multi-threaded benchmark so we can focus on building multi-threaded speedups.  As more computers adapt more cores and threads, the parsec benchmark will allow us to view a relevant benchmark.
-% \subsubsection{Real World}
-% While standard benchmarks are important, many efficiency increases only matter if they are applicable to the real world.  We can use gcc as a bench mark if we use gem5 and input a program to be compiled using our cache algorithm with "gcc" and "gcc -jn" to check the speedups per thread count. This will only be done if we believe that our benchmark is not satisfactory in gathering all the information we need, or if we have the extra time to develop it.
-% \subsection{Comparison}
-% Our comparison against other algorithms will consist of timing the performance and tracking the efficiency of the algorithm against the standard benchmark.  Using this data, we will utilize python to create visualizations to compare our results with.
-
-% \textbf{XOR Paper Notes 2025 \cite{The_XOR_Cache}}\\
-
-% - leverage redundancy that comes from private caching and inclusion\\
-% - increasing cache size is not the best solution to cache performance - high access latency\\
-% - cache compression compresses lines upon insertion and decompresses upon access\\
-% - XOR cache spans multiple caches\\
-% - inclusive cache hierarchies introduce data redundancy\\
-% - In xor, an inclusive cache line can xor with another line from a lower level as a single line $A\oplus B$. On access, the line is sent forward to the higher level cache, and XORed again to reverse the compression\\
-% - lines in L1s are never XORed, L1 hits do not impose extra latency\\
-% - typical cache compression methods exploit redundancy within a single cache level - extra opportunities for compression across level boundary not being utilized in other methods - inter-line compression\\
-% - leverages redundancy due to private caching to decompress data via forwarding between the private caches\\
-% - XOR uses both types of redundancy when compressing\\
-% - cache compression separated into intra- and inter-line based on compression granularity: intra-captures value similarity within a single memory or cache line; inter- compress multiple similar lines and store only one copy, along with additional metadata\\
-% - XOR stores bitwise XOR results of line pairs - symmetrical compression and decompression\\
-% - opportunistic XOR policy that allows for compression when any candidate is available, or synergistic policy: similar lines allowed to XOR together 
-% - tests show that XOR saves significant power and area with minimal performance loss\\
-% - XOR has 26.3\% lower energy delay product than the uncompressed baseline\\
 
 
 \bibliographystyle{IEEEtran}
