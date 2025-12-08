@@ -155,7 +155,7 @@ Base::compress(const uint64_t* data, Cycles& comp_lat, Cycles& decomp_lat)
 
     // If we are in debug mode apply decompression just after the compression.
     // If the results do not match, we've got an error
-    // #ifdef DEBUG_COMPRESSION
+    #ifdef DEBUG_COMPRESSION
     uint64_t decomp_data[blkSize/8];
 
     // Apply decompression
@@ -164,7 +164,7 @@ Base::compress(const uint64_t* data, Cycles& comp_lat, Cycles& decomp_lat)
     // Check if decompressed line matches original cache line
     fatal_if(std::memcmp(data, decomp_data, blkSize),
              "Decompressed line does not match original line.");
-    // #endif
+    #endif
 
     // Get compression size. If compressed size is greater than the size
     // threshold, the compression is seen as unsuccessful
