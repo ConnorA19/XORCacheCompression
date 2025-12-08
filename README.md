@@ -38,7 +38,6 @@ Then move configs and tests back with
 ```
 rm -rf ./gem5/configs
 rm -rf ./gem5/tests
-rm -rf ./gem5/src
 mv ./gem5Temp/* ./gem5/
 ```
 
