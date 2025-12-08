@@ -1,0 +1,19 @@
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_progress_report /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -DPARSEC_VERSION=3.0-beta-20150206   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/share/cmake-2.6/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -DPARSEC_VERSION=3.0-beta-20150206   -DCHECK_FUNCTION_EXISTS=pthread_create  -fPIC -L/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/lib  CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads: No such file or directory
+collect2: error: ld returned 1 exit status
+make[1]: Leaving directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+make[1]: *** [CMakeFiles/cmTryCompileExec.dir/build.make:87: cmTryCompileExec] Error 1
+gmake: *** [Makefile:111: cmTryCompileExec/fast] Error 2
+
+

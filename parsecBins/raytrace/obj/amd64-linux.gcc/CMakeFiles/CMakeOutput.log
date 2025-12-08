@@ -1,0 +1,123 @@
+The system is: Linux - 6.14.0-36-generic - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/gcc 
+Build flags: ;;-DPARSEC_VERSION=3.0-beta-20150206
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/g++ 
+Build flags: -I/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/include;-fpermissive;-fno-exceptions;-std=c++17;-DPARSEC_VERSION=3.0-beta-20150206;-fexceptions;-fno-strict-aliasing;-fno-align-labels;-DNDEBUG;-D_MM_NO_ALIGN_CHECK
+Id flags: 
+
+The output was:
+0
+CMakeCXXCompilerId.cpp:70:23: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   70 | char* info_compiler = "INFO" ":" "compiler[" COMPILER_ID "]";
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CMakeCXXCompilerId.cpp:154:23: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  154 | char* info_platform = "INFO" ":" "platform[" PLATFORM_ID "]";
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CompilerIdCXX/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_progress_report /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/testCCompiler.c.o
+/usr/bin/gcc   -DPARSEC_VERSION=3.0-beta-20150206      -o CMakeFiles/cmTryCompileExec.dir/testCCompiler.c.o   -c /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -DPARSEC_VERSION=3.0-beta-20150206     -fPIC -L/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/lib  CMakeFiles/cmTryCompileExec.dir/testCCompiler.c.o  -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_progress_report /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CMakeCCompilerABI.c.o
+/usr/bin/gcc   -DPARSEC_VERSION=3.0-beta-20150206      -o CMakeFiles/cmTryCompileExec.dir/CMakeCCompilerABI.c.o   -c /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/share/cmake-2.6/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -DPARSEC_VERSION=3.0-beta-20150206     -fPIC -L/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/lib  CMakeFiles/cmTryCompileExec.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_progress_report /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o
+/usr/bin/g++    -I/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/include -fpermissive -fno-exceptions -std=c++17 -DPARSEC_VERSION=3.0-beta-20150206 -fexceptions -fno-strict-aliasing -fno-align-labels -DNDEBUG -D_MM_NO_ALIGN_CHECK      -o CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o -c /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/g++    -I/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/include -fpermissive -fno-exceptions -std=c++17 -DPARSEC_VERSION=3.0-beta-20150206 -fexceptions -fno-strict-aliasing -fno-align-labels -DNDEBUG -D_MM_NO_ALIGN_CHECK     -fPIC -L/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/lib  CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_progress_report /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/g++    -I/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/include -fpermissive -fno-exceptions -std=c++17 -DPARSEC_VERSION=3.0-beta-20150206 -fexceptions -fno-strict-aliasing -fno-align-labels -DNDEBUG -D_MM_NO_ALIGN_CHECK      -o CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o -c /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/share/cmake-2.6/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/g++    -I/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/include -fpermissive -fno-exceptions -std=c++17 -DPARSEC_VERSION=3.0-beta-20150206 -fexceptions -fno-strict-aliasing -fno-align-labels -DNDEBUG -D_MM_NO_ALIGN_CHECK     -fPIC -L/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/lib  CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+
+
+Determining if files pthread.h exist passed with the following output:
+Change Dir: /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_progress_report /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFiles.c.o
+/usr/bin/gcc   -DPARSEC_VERSION=3.0-beta-20150206      -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFiles.c.o   -c /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+Linking C executable cmTryCompileExec
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -DPARSEC_VERSION=3.0-beta-20150206     -fPIC -L/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/lib  CMakeFiles/cmTryCompileExec.dir/CheckIncludeFiles.c.o  -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+
+
+Determining if the function pthread_create exists in the pthread passed with the following output:
+Change Dir: /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_progress_report /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/bin/gcc   -DPARSEC_VERSION=3.0-beta-20150206   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/share/cmake-2.6/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/tools/cmake/inst/amd64-linux.gcc/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/gcc     -DPARSEC_VERSION=3.0-beta-20150206   -DCHECK_FUNCTION_EXISTS=pthread_create  -fPIC -L/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/libs/mesa/inst/amd64-linux.gcc/lib  CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic -lpthread 
+make[1]: Leaving directory '/export/scratch/users/anton386/remove_me2/parsec-benchmark/pkgs/apps/raytrace/obj/amd64-linux.gcc/CMakeFiles/CMakeTmp'
+
+
