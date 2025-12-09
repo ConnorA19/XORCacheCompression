@@ -64,6 +64,7 @@ Sections to include in paper:
 \end{enumerate}
 
 \section{Abstract}
+Cache compression allows for the condensing of larger chunks of data into smaller chunks for storage. This method improves cache performance by attaining the benefits that come with increasing cache size without any of the latency concerns that come with it. One such approach to cache compression is by leveraging data redundanvy across and within cache lines. The XOR Cache is a method that does just that. The XOR Cache conducts a series of XOR operations across and within cachelines in order to compress data, storing just the XORed line. XOR Cache is a structure that, in even naive implementations, can reduce entropy, and has potential for further benefits when used alongside other compression schemes. --\textbf{NOTE:} include some information from the results here. 
 
 \section{Introduction}
 At its core, computing is the transfer of information and as time goes on, the amount of data we collect, process, and store grows. This presents a key challenge of how to utilize the resources you have as efficiently as possible so that you consume less power. This problem compounds as we take a look at the world of computing and how a few speed-ups on some algorithms have saved billions of dollars in energy use worldwide. One method that helps our compute performance is compression. The goal of compression is to take a larger chunk of data and condense them to take up less space. More importantly, we can move this information faster when it takes up less space because it takes up less bandwidth. Today's processors have dedicated space on their die built for fast access SRAM for caching purposes. The CPU cache is one of its most powerful tools for quickly accessing local memory, much faster than typical RAM accesses. However, a processor's die can only fit so many components, making the placement of each unit compromise the compute efficiency in some way. Knowing this, cache compression has been an avenue through which we can squeeze more power out of processors while utilizing fewer resources. 
@@ -188,7 +189,7 @@ The code for the program, benchmarks, and results can be viewed here:
 
 \section{Benchmarks \& Testing Metrics}
 
-The PARSEC benchmark suite \cite{Parsec}, and its set of 12 programs, were used as benchmarks for testing the XOR cache. These benchmarks are used across scholarship \cite{Base-delta-immediate_compression, Last-level_cache_deduplication, 2DCC} for testing other schemes of cache compression. The benchmarks were chosen for our experiment in order to compare our algorithm design to other compression methods, as well as to use a real world multi-threaded benchmark in order to focus on building multi-threaded speedups.
+The PARSEC benchmark suite \cite{Parsec}, and and a number of its programs, were used as benchmarks for testing the XOR cache. These benchmarks are used across scholarship \cite{Base-delta-immediate_compression, Last-level_cache_deduplication, 2DCC} for testing other schemes of cache compression. The benchmarks were chosen for our experiment in order to compare our algorithm design to other compression methods, as well as to use a real world multi-threaded benchmark in order to focus on building multi-threaded speedups. On the chosen PARSEC benchmarks - ferret, fluidanimate, freqmine, raytrace, swaptions, vips, and x264 - the performance of XOR cache was tested against a cache with no compression scheme, as well as with gem5's FPCD compressor for comparison.
 
 In addition to the PARSEC benchmarks, our XOR cache compression algorithm was run on a set of 4 small benchmark tests. These benchmarks were built for the purpose of easily viewing the functioning of the XOR cache and its compression output on a small, easily digestible scale. The pseudocode for each of these tests can be seen in Appendix A, but are briefly described below:
 
@@ -206,6 +207,8 @@ The metrics being collected for each test are instructions per cycle (IPC), cycl
 \section{Results}
 
 \section{Discussion}
+\subsection{Challenges}
+There were a number of challenges that we experienced through the process of implementing and testing the XOR cache. One such challenge that was discovered early on was gem5 version compatibility. The most recent stable version of gem5 - as of the time this project began - was version 24.1. However, this version of gem5, as well as even more recent development branches, were not compatible with the compressors needed for building the XOR cache. It was because of this incompatibility that we were faced with a number of "bad\_function\_call" and assertion errors. It was once we switched the version to v23.1 that we were able to get around these difficulties. This is the version that our XOR cache has been implemented in.
 
 \section{Conclusion}
 
