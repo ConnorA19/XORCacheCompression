@@ -6,7 +6,8 @@
 #   mv ./m5out/stats.txt "../output/stats_${1}_${2}_${3}.txt"
 #   echo "Wrote ../output/stats_${1}_${2}_${3}.txt"
 # }
-benchmarkNames=("blackscholes" "bodytrack" "facesim" "ferret", "fluidanimate", "freqmine", "raytrace", "swaptions", "vips", "x264")
+#benchmarkNames=("blackscholes" "bodytrack" "facesim" "ferret" "fluidanimate" "freqmine" "raytrace" "swaptions" "vips" "x264")
+benchmarkNames=("ferret" "fluidanimate" "freqmine" "raytrace" "swaptions" "vips" "x264")
 
 for benchmarkName in "${benchmarkNames[@]}"; do
   cd ./parsec-benchmark
