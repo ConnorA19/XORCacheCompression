@@ -9,38 +9,14 @@ Lila Craveiro (crave112@umn.edu)
 Zannatun Sristy (srist001@umn.edu)
 
 # Setup
-## Python Environment
-If you have a python environment already run 
+Add all of the folders to a gem5 download, compile with 
 ```
-source PATH/TO/PYVENV/bin/activate
+scons ./build/ALL/gem5.opt -j8
 ```
-If you do not have a python environment you can run
+change directory to gem5 and run 
 ```
-python -m venv PATH/TO/FOLDER/YOU/WANT/YOUR/VENV/IN
+make test
 ```
-Once you have sourced the activate run
-```
-pip install -r requirements.txt
-```
-
-## Gem5
-Move the current Gem5 configs and tests with
-```
-mv ./gem5 ./gem5Temp
-```
-Then run: 
-
-  ```sh
-  git clone https://github.com/gem5/gem5
-  rm -rf ./gem5/.git
-  ```
-Then move configs and tests back with
-```
-rm -rf ./gem5/configs
-rm -rf ./gem5/tests
-mv ./gem5Temp/* ./gem5/
-```
-
 # Benchmarks
 There are 4 benchmarks for testing the program. Each has a differently composed array, and a given task to complete:
 
